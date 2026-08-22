@@ -1,0 +1,174 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-flame: var(--flame);
+  --color-cream: var(--cream);
+  --color-bean: var(--bean);
+  --color-tan: var(--tan);
+  --color-sand: var(--sand);
+  --color-oat: var(--oat);
+  --color-espresso: var(--espresso);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Warm hospitality palette — cream backgrounds, oat/tan surfaces,
+     deep coffee-brown text and anchors. Flame orange becomes a focused
+     accent rather than the dominant tone. */
+
+  /* Surfaces */
+  --background: oklch(0.968 0.018 78);        /* warm cream */
+  --foreground: oklch(0.27 0.045 50);         /* deep coffee — primary text */
+  --card: oklch(0.985 0.013 82);              /* slightly lifted cream */
+  --card-foreground: oklch(0.27 0.045 50);
+  --popover: oklch(0.985 0.013 82);
+  --popover-foreground: oklch(0.27 0.045 50);
+
+  /* Brand accent — flame orange, used selectively for CTAs/highlights */
+  --primary: oklch(0.66 0.16 50);
+  --primary-foreground: oklch(0.985 0.008 85);
+
+  /* Secondary surface — oat */
+  --secondary: oklch(0.915 0.028 76);
+  --secondary-foreground: oklch(0.30 0.05 48);
+
+  /* Muted — warm sand */
+  --muted: oklch(0.94 0.022 78);
+  --muted-foreground: oklch(0.46 0.04 52);    /* warm taupe text */
+
+  /* Accent — tan, for chips/highlights instead of orange */
+  --accent: oklch(0.85 0.055 70);
+  --accent-foreground: oklch(0.28 0.05 48);
+
+  --destructive: oklch(0.56 0.20 27);
+  --destructive-foreground: oklch(0.985 0.008 85);
+
+  /* Borders — warm brown-tinted, slightly more visible for hierarchy */
+  --border: oklch(0.83 0.025 70);
+  --input: oklch(0.87 0.025 70);
+  --ring: oklch(0.66 0.16 50);
+
+  /* Brand tokens */
+  --flame: oklch(0.66 0.16 50);
+  --cream: oklch(0.968 0.018 78);
+  --bean: oklch(0.27 0.045 45);
+  --tan: oklch(0.80 0.05 68);
+  --sand: oklch(0.89 0.035 74);
+  --oat: oklch(0.93 0.025 78);
+  --espresso: oklch(0.22 0.04 45);
+}
+
+.dark {
+  --background: oklch(0.19 0.025 50);
+  --foreground: oklch(0.96 0.015 80);
+  --card: oklch(0.23 0.03 50);
+  --card-foreground: oklch(0.96 0.015 80);
+  --popover: oklch(0.23 0.03 50);
+  --popover-foreground: oklch(0.96 0.015 80);
+  --primary: oklch(0.74 0.17 55);
+  --primary-foreground: oklch(0.18 0.025 50);
+  --secondary: oklch(0.29 0.03 50);
+  --secondary-foreground: oklch(0.96 0.015 80);
+  --muted: oklch(0.26 0.025 50);
+  --muted-foreground: oklch(0.74 0.025 70);
+  --accent: oklch(0.38 0.05 60);
+  --accent-foreground: oklch(0.96 0.015 80);
+  --destructive: oklch(0.65 0.22 27);
+  --destructive-foreground: oklch(0.96 0.015 80);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.74 0.17 55);
+  --tan: oklch(0.55 0.05 65);
+  --sand: oklch(0.40 0.035 70);
+  --oat: oklch(0.32 0.03 60);
+  --espresso: oklch(0.16 0.03 45);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--espresso);
+  }
+}
+
+@layer utilities {
+  /* Subtle layered cream → sand wash for the public app shell. Lighter
+     than before so it reads as paper, not as an orange tint. */
+  .bg-warm-gradient {
+    background-image:
+      radial-gradient(at 18% -10%, oklch(0.94 0.04 70) 0%, transparent 55%),
+      radial-gradient(at 92% 110%, oklch(0.90 0.035 65) 0%, transparent 55%),
+      linear-gradient(180deg, var(--background), oklch(0.955 0.022 76));
+    background-attachment: fixed;
+  }
+
+  /* Soft, warm card shadow — adds depth without heaviness. */
+  .shadow-warm {
+    box-shadow:
+      0 1px 2px oklch(0.30 0.05 50 / 0.06),
+      0 10px 28px -14px oklch(0.30 0.05 50 / 0.18);
+  }
+  .shadow-warm-sm {
+    box-shadow:
+      0 1px 0 oklch(1 0 0 / 0.5) inset,
+      0 1px 2px oklch(0.30 0.05 50 / 0.06);
+  }
+
+  /* Hairline divider tuned to the warm palette. */
+  .divider-warm {
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+}

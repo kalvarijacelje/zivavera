@@ -1,0 +1,1 @@
+ALTER TABLE public.static_page_sections ADD COLUMN IF NOT EXISTS items jsonb NOT NULL DEFAULT '[]'::jsonb;

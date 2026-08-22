@@ -1,0 +1,131 @@
+import { supabase } from "@/integrations/supabase/client";
+
+export type SectionType =
+  | "hero"
+  | "simple_text_block"
+  | "text_with_image"
+  | "quote_or_highlight"
+  | "call_to_action"
+  | "image_block"
+  | "policy_section"
+  | "image_gallery"
+  | "card_grid"
+  | "faq"
+  | "video"
+  | "alternating_content"
+  | "testimonial";
+
+export const SECTION_TYPES: { value: SectionType; label: string; hint: string }[] = [
+  { value: "hero", label: "Hero", hint: "Eyebrow + title + subtitle, optional background image" },
+  { value: "simple_text_block", label: "Simple text block", hint: "Title + body, centered" },
+  { value: "text_with_image", label: "Text with image", hint: "Two-column block with image and text" },
+  { value: "quote_or_highlight", label: "Quote / highlight", hint: "Large pulled quote or highlight card" },
+  { value: "call_to_action", label: "Call to action", hint: "Title + body + button, optional small note" },
+  { value: "image_block", label: "Image block", hint: "Standalone image with optional caption" },
+  { value: "policy_section", label: "Policy section", hint: "Intro body + bullet list + closing body" },
+  { value: "image_gallery", label: "Image gallery", hint: "Responsive grid of images with optional captions" },
+  { value: "card_grid", label: "Card grid", hint: "Repeatable cards: image/icon, title, body, optional link" },
+  { value: "faq", label: "FAQ / accordion", hint: "Collapsible questions and answers" },
+  { value: "video", label: "Video", hint: "YouTube/Vimeo embed with optional title and caption" },
+  { value: "alternating_content", label: "Alternating content", hint: "Multiple text+image rows that flip sides" },
+  { value: "testimonial", label: "Testimonials / stories", hint: "Quotes from people, with name and role" },
+];
+
+export type Bullet = { text_en: string; text_sl: string };
+
+/** Generic repeatable item. Different block types use different subsets of these fields. */
+export type SectionItem = {
+  // Common bilingual text
+  title_en?: string;
+  title_sl?: string;
+  body_en?: string;
+  body_sl?: string;
+  // Media
+  image_path?: string | null;
+  // Card / gallery extras
+  caption_en?: string;
+  caption_sl?: string;
+  link?: string;
+  icon?: string;
+  // FAQ
+  q_en?: string;
+  q_sl?: string;
+  a_en?: string;
+  a_sl?: string;
+  // Testimonial
+  quote_en?: string;
+  quote_sl?: string;
+  name?: string;
+  role_en?: string;
+  role_sl?: string;
+  // Alternating row variant
+  variant?: "left" | "right";
+};
+
+export type StaticPageSection = {
+  id: string;
+  page_id: string;
+  section_type: SectionType;
+  internal_label: string;
+  sort_order: number;
+  published: boolean;
+  eyebrow_en: string | null;
+  eyebrow_sl: string | null;
+  title_en: string | null;
+  title_sl: string | null;
+  subtitle_en: string | null;
+  subtitle_sl: string | null;
+  body_en: string | null;
+  body_sl: string | null;
+  image_path: string | null;
+  button_text_en: string | null;
+  button_text_sl: string | null;
+  button_link: string | null;
+  layout_variant: string;
+  bullets: Bullet[];
+  items: SectionItem[];
+};
+
+export type StaticPage = {
+  id: string;
+  page_key: string;
+  internal_label: string;
+  title_en: string;
+  title_sl: string;
+  published: boolean;
+  show_in_navigation: boolean;
+  nav_order: number;
+};
+
+export async function fetchStaticPageByKey(pageKey: string) {
+  const { data: page, error: pErr } = await supabase
+    .from("static_pages")
+    .select("*")
+    .eq("page_key", pageKey)
+    .eq("published", true)
+    .maybeSingle();
+  if (pErr || !page) return { page: null as StaticPage | null, sections: [] as StaticPageSection[] };
+
+  const { data: sections } = await supabase
+    .from("static_page_sections")
+    .select("*")
+    .eq("page_id", page.id)
+    .eq("published", true)
+    .order("sort_order");
+
+  return {
+    page: page as unknown as StaticPage,
+    sections: ((sections ?? []) as unknown as StaticPageSection[]).map((s) => ({
+      ...s,
+      bullets: Array.isArray(s.bullets) ? (s.bullets as Bullet[]) : [],
+      items: Array.isArray((s as unknown as { items?: unknown }).items)
+        ? ((s as unknown as { items: SectionItem[] }).items)
+        : [],
+    })),
+  };
+}
+
+export function fieldByLocale<T>(en: T | null | undefined, sl: T | null | undefined, locale: string): T | null {
+  if (locale === "sl") return sl ?? en ?? null;
+  return en ?? sl ?? null;
+}
