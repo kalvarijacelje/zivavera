@@ -106,6 +106,12 @@ export async function fetchStaticPageByKey(pageKey: string) {
     .maybeSingle();
   if (pErr || !page) return { page: null as StaticPage | null, sections: [] as StaticPageSection[] };
 
+  // Sync English title in DB if it was still legacy "About us"
+  if (page.page_key === "about" && (!page.title_en || page.title_en.toLowerCase() === "about us" || page.title_en.toLowerCase() === "about")) {
+    page.title_en = "Get to know us";
+    supabase.from("static_pages").update({ title_en: "Get to know us" }).eq("id", page.id).then();
+  }
+
   const { data: sections } = await supabase
     .from("static_page_sections")
     .select("*")
@@ -113,15 +119,51 @@ export async function fetchStaticPageByKey(pageKey: string) {
     .eq("published", true)
     .order("sort_order");
 
-  return {
-    page: page as unknown as StaticPage,
-    sections: ((sections ?? []) as unknown as StaticPageSection[]).map((s) => ({
+  const mappedSections: StaticPageSection[] = ((sections ?? []) as unknown as StaticPageSection[]).map((s) => {
+    // If the about page has a legacy duplicate homepage hero, update it to the new unique copy
+    if (s.section_type === "hero" && page.page_key === "about") {
+      const isLegacyDuplicate =
+        s.title_sl === "Dobra kava, pristen pogovor in iskreno gostoljubje" ||
+        s.title_sl === "Dobra kava, pristen pogovor, iskreno gostoljubje." ||
+        s.eyebrow_sl === "Prva krščanska neprofitna kavarna v Sloveniji" ||
+        s.eyebrow_sl === "Unikatna kavarna, ki deluje po veri";
+
+      if (isLegacyDuplicate) {
+        s.title_sl = "Kavarna, ki jo poganjata vera in ljubezen do ljudi";
+        s.title_en = "A café powered by faith and love for people";
+        s.eyebrow_sl = "Zgodba in poslanstvo";
+        s.eyebrow_en = "Our Story & Mission";
+        s.subtitle_sl = "Spoznajte zgodbo in srce ŽIVE VERE — neprofitnega prostora v Celju, kjer se odlična kava Barcaffè prepleta z iskrenimi pogovori, toplim sprejemom in dobrodelnostjo za otroke v Etiopiji.";
+        s.subtitle_en = "Discover the story behind ŽIVA VERA — a welcoming haven in Celje where exceptional Barcaffè coffee meets heartfelt conversations, open hospitality, and direct support for children in need.";
+
+        // Persist update into Supabase database
+        supabase
+          .from("static_page_sections")
+          .update({
+            title_sl: s.title_sl,
+            title_en: s.title_en,
+            eyebrow_sl: s.eyebrow_sl,
+            eyebrow_en: s.eyebrow_en,
+            subtitle_sl: s.subtitle_sl,
+            subtitle_en: s.subtitle_en,
+          })
+          .eq("id", s.id)
+          .then();
+      }
+    }
+
+    return {
       ...s,
       bullets: Array.isArray(s.bullets) ? (s.bullets as Bullet[]) : [],
       items: Array.isArray((s as unknown as { items?: unknown }).items)
         ? ((s as unknown as { items: SectionItem[] }).items)
         : [],
-    })),
+    };
+  });
+
+  return {
+    page: page as unknown as StaticPage,
+    sections: mappedSections,
   };
 }
 

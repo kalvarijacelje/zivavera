@@ -25,6 +25,9 @@ const signedCache = new Map<string, { url: string; expires: number }>();
 
 export async function getSignedMediaUrl(path: string | null | undefined): Promise<string | null> {
   if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+    return path;
+  }
   const now = Date.now();
   const cached = signedCache.get(path);
   if (cached && cached.expires > now + 60_000) return cached.url;

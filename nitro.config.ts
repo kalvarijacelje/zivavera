@@ -1,8 +1,7 @@
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineNitroConfig } from "nitro/config";
 import path from "path";
 import fs from "fs";
 
-// Sync master logo files in public folder
 try {
   const masterLogo = path.resolve(__dirname, "../kck/public/KCK-logo-rdec_small.png");
   const masterSecondary = path.resolve(__dirname, "../kck/public/KCK-logo-rdec-sekundaren_small.png");
@@ -21,8 +20,6 @@ try {
   // ignore
 }
 
-export default defineConfig({
-  tanstackStart: {
-    server: { entry: "server" },
-  },
+export default defineNitroConfig({
+  preset: "vercel",
 });

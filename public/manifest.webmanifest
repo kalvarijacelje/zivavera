@@ -1,0 +1,26 @@
+{
+  "name": "ŽIVA VERA — Kavarna",
+  "short_name": "Živa Vera",
+  "description": "Neprofitna krščanska kavarna v Celju — kava, prijaznost, iskreni pogovori in gostoljubje",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2c1810",
+  "theme_color": "#8b5e34",
+  "lang": "sl",
+  "icons": [
+    {
+      "src": "/logo-icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/KCK-logo-rdec_small.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

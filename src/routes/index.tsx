@@ -19,7 +19,7 @@ import {
   Gift,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import heroImg from "@/assets/hero-cafe.jpg";
 import communityImg from "@/assets/community.jpg";
 import espressoImg from "@/assets/coffee-espresso.jpg";
@@ -126,8 +126,111 @@ const DEFAULT_IMAGES: Record<string, string> = {
   espresso: espressoImg,
 };
 
+const DEFAULT_HOMEPAGE_SECTIONS: Section[] = [
+  {
+    id: "h-hero",
+    section_type: "hero",
+    sort_order: 10,
+    eyebrow_sl: "Unikatna kavarna, ki deluje po veri",
+    eyebrow_en: "A unique café that runs on faith",
+    title_sl: "Dobra kava, pristen pogovor, iskreno gostoljubje.",
+    title_en: "Good coffee, real conversation, honest hospitality.",
+    subtitle_sl: "Dobrodošli v Živi veri — prvi krščanski neprofitni kavarni v Sloveniji. Cenika ni. Ostanite, delite trenutek in prispevajte po svoji presoji.",
+    subtitle_en: "Welcome to ŽIVA VERA — Slovenia's first Christian non-profit coffee shop. There is no price list. Stay, share, and contribute what feels right.",
+    body_sl: null,
+    body_en: null,
+    image_path: null,
+    default_image_key: "hero",
+    image_alignment: "left",
+    button_text_sl: "Oglejte si ponudbo",
+    button_text_en: "See the menu",
+    button_link: "/menu",
+    secondary_button_text_sl: "Načrtujte obisk",
+    secondary_button_text_en: "Plan your visit",
+    secondary_button_link: "/visit",
+    featured_menu_item_ids: [],
+    featured_event_ids: [],
+    value_cards: null,
+  },
+  {
+    id: "h-values",
+    section_type: "values_grid",
+    sort_order: 20,
+    eyebrow_sl: null,
+    eyebrow_en: null,
+    title_sl: "Kaj nas dela posebne",
+    title_en: "What makes us different",
+    subtitle_sl: null,
+    subtitle_en: null,
+    body_sl: null,
+    body_en: null,
+    image_path: null,
+    default_image_key: null,
+    image_alignment: "left",
+    button_text_sl: null,
+    button_text_en: null,
+    button_link: null,
+    secondary_button_text_sl: null,
+    secondary_button_text_en: null,
+    secondary_button_link: null,
+    featured_menu_item_ids: [],
+    featured_event_ids: [],
+    value_cards: null,
+  },
+  {
+    id: "h-menu",
+    section_type: "featured_menu",
+    sort_order: 30,
+    eyebrow_sl: null,
+    eyebrow_en: null,
+    title_sl: "Iz naše kavarne",
+    title_en: "From our counter",
+    subtitle_sl: null,
+    subtitle_en: null,
+    body_sl: "Espresso napitki, čaji, vroča čokolada, sveži sokovi in nekaj sladkega — pripravljeno s skrbjo, postreženo z nasmehom.",
+    body_en: "Espresso drinks, teas, hot chocolate, fresh juices and a few sweet things — prepared with care, served with a smile.",
+    image_path: null,
+    default_image_key: null,
+    image_alignment: "left",
+    button_text_sl: "Poglejte celotno ponudbo",
+    button_text_en: "Browse the full menu",
+    button_link: "/menu",
+    secondary_button_text_sl: null,
+    secondary_button_text_en: null,
+    secondary_button_link: null,
+    featured_menu_item_ids: [],
+    featured_event_ids: [],
+    value_cards: null,
+  },
+  {
+    id: "h-community",
+    section_type: "text_with_image",
+    sort_order: 40,
+    eyebrow_sl: null,
+    eyebrow_en: null,
+    title_sl: "Več kot le kavarna",
+    title_en: "More than a café",
+    subtitle_sl: null,
+    subtitle_en: null,
+    body_sl: "ŽIVA VERA je prostor za srečanje, pogovor in mirno preživet čas. Prostor, kjer ste dobrodošli točno takšni, kot ste.",
+    body_en: "ŽIVA VERA is a place to meet, talk, and take your time. A place where you're welcome exactly as you are.",
+    image_path: null,
+    default_image_key: "community",
+    image_alignment: "right",
+    button_text_sl: "Preberite našo zgodbo",
+    button_text_en: "Read our story",
+    button_link: "/about",
+    secondary_button_text_sl: null,
+    secondary_button_text_en: null,
+    secondary_button_link: null,
+    featured_menu_item_ids: [],
+    featured_event_ids: [],
+    value_cards: null,
+  },
+];
+
 function HomePage() {
-  const [sections, setSections] = useState<Section[] | null>(null);
+  const [sections, setSections] = useState<Section[]>(DEFAULT_HOMEPAGE_SECTIONS);
   const [menuItems, setMenuItems] = useState<Record<string, MenuItem>>({});
   const [events, setEvents] = useState<Record<string, Event>>({});
 
@@ -140,9 +243,12 @@ function HomePage() {
         .eq("published", true)
         .order("sort_order");
       if (!alive) return;
-      const list = (data as Section[]) ?? [];
-      setSections(list);
+      if (data && data.length > 0) {
+        const list = data as Section[];
+        setSections(list);
+      }
 
+      const list = (data as Section[]) ?? [];
       const menuIds = Array.from(new Set(list.flatMap((s) => s.featured_menu_item_ids ?? [])));
       const eventIds = Array.from(new Set(list.flatMap((s) => s.featured_event_ids ?? [])));
 
@@ -177,10 +283,10 @@ function HomePage() {
   return (
     <SiteShell>
       {(sections ?? []).map((s, i) => (
-        <>
-          <SectionRenderer key={s.id} section={s} menuItems={menuItems} events={events} />
-          {i === 0 && <CafeStatusBanner key={`status-${s.id}`} />}
-        </>
+        <Fragment key={s.id}>
+          <SectionRenderer section={s} menuItems={menuItems} events={events} />
+          {i === 0 && <CafeStatusBanner />}
+        </Fragment>
       ))}
       {sections && sections.length === 0 && <CafeStatusBanner />}
     </SiteShell>
@@ -222,20 +328,41 @@ function usePick() {
 }
 
 function useSectionImage(section: Section) {
+  const defaultImg =
+    DEFAULT_IMAGES[section.default_image_key ?? ""] ??
+    (section.section_type === "hero"
+      ? heroImg
+      : section.section_type === "call_to_action"
+        ? communityImg
+        : section.section_type === "text_with_image"
+          ? espressoImg
+          : null);
+
   const [url, setUrl] = useState<string | null>(
-    section.image_path ? null : DEFAULT_IMAGES[section.default_image_key ?? ""] ?? null,
+    section.image_path && (section.image_path.startsWith("http") || section.image_path.startsWith("/"))
+      ? section.image_path
+      : defaultImg,
   );
+
   useEffect(() => {
     let active = true;
     if (section.image_path) {
-      getSignedMediaUrl(section.image_path).then((u) => active && setUrl(u));
+      if (section.image_path.startsWith("http") || section.image_path.startsWith("/")) {
+        setUrl(section.image_path);
+        return;
+      }
+      getSignedMediaUrl(section.image_path).then((u) => {
+        if (active) {
+          setUrl(u || defaultImg);
+        }
+      });
     } else {
-      setUrl(DEFAULT_IMAGES[section.default_image_key ?? ""] ?? null);
+      setUrl(defaultImg);
     }
     return () => {
       active = false;
     };
-  }, [section.image_path, section.default_image_key]);
+  }, [section.image_path, section.default_image_key, defaultImg]);
   return url;
 }
 
@@ -248,34 +375,43 @@ function HeroSection({ s }: { s: Section }) {
   const btn1 = pick(s.button_text_en, s.button_text_sl);
   const btn2 = pick(s.secondary_button_text_en, s.secondary_button_text_sl);
   return (
-    <section className="relative isolate overflow-hidden">
+    <section className="relative isolate overflow-hidden min-h-[560px] flex items-center">
       <div className="absolute inset-0 z-0">
-        {img && <img key={img} src={img} alt="" width={1920} height={1280} className="size-full object-cover" />}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/55 to-background" />
+        {img && (
+          <img
+            key={img}
+            src={img}
+            alt=""
+            width={1920}
+            height={1280}
+            className="size-full object-cover scale-105 transition-transform duration-1000"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/65 to-background" />
       </div>
-      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-20 sm:px-6 md:pb-32 md:pt-28 py-[30px] pb-[50px]">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28 w-full">
         {eyebrow && (
-          <p className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/70 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary backdrop-blur">
-            <span className="size-1.5 rounded-full bg-primary" />
+          <p className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/80 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary backdrop-blur-sm shadow-xs">
+            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
             {eyebrow}
           </p>
         )}
         {title && (
-          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.05] text-balance text-foreground sm:text-5xl md:text-6xl">
+          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.08] text-balance text-foreground sm:text-5xl md:text-6xl tracking-tight">
             {title}
           </h1>
         )}
         {subtitle && (
-          <p className="mt-5 max-w-2xl text-base text-pretty font-semibold text-foreground sm:text-lg">
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-pretty font-normal text-muted-foreground sm:text-lg">
             {subtitle}
           </p>
         )}
         {(btn1 || btn2) && (
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3.5">
             {btn1 && s.button_link && (
               <SectionLink
                 to={s.button_link}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-transform hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:-translate-y-0.5"
               >
                 {btn1} <ArrowRight className="size-4" />
               </SectionLink>
@@ -283,7 +419,7 @@ function HeroSection({ s }: { s: Section }) {
             {btn2 && s.secondary_button_link && (
               <SectionLink
                 to={s.secondary_button_link}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-5 py-3 text-sm font-semibold text-foreground backdrop-blur hover:bg-card"
+                className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/90 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition-all hover:bg-secondary hover:shadow-xs"
               >
                 {btn2}
               </SectionLink>
@@ -325,19 +461,30 @@ function ValuesSection({ s }: { s: Section }) {
       {title && (
         <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h2>
       )}
-      <div className="mt-10 grid gap-5 md:grid-cols-3">
+      <div
+        className={cn(
+          "mt-10 grid gap-5",
+          cards.length === 4
+            ? "sm:grid-cols-2 lg:grid-cols-4"
+            : "sm:grid-cols-2 md:grid-cols-3",
+        )}
+      >
         {cards.map((card, i) => {
           const Icon = card.icon;
           return (
             <article
               key={i}
-              className="group rounded-3xl border border-border bg-card p-6 transition-shadow hover:shadow-md"
+              className="group flex flex-col rounded-3xl border border-border/80 bg-card p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
             >
-              <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Icon className="size-5" />
+              <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <Icon className="size-6" />
               </div>
-              <h3 className="mt-5 font-display text-xl font-semibold">{card.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{card.body}</p>
+              <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-foreground">
+                {card.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground flex-1">
+                {card.body}
+              </p>
             </article>
           );
         })}

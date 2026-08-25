@@ -89,25 +89,41 @@ function MenuPage() {
 
   return (
     <SiteShell>
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
-        <header className="max-w-2xl">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+      {/* Full-width Ambient Hero Banner matching homepage */}
+      <section className="relative isolate overflow-hidden min-h-[460px] sm:min-h-[520px] flex items-center">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1920&q=80"
+            alt=""
+            width={1920}
+            height={1280}
+            className="size-full object-cover scale-105 transition-transform duration-1000"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/65 to-background" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6 md:py-24 w-full">
+          <p className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/80 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary backdrop-blur-sm shadow-xs">
+            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
             {t("brand.partner")}
           </p>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.08] text-balance text-foreground sm:text-5xl md:text-6xl tracking-tight">
             {t("menu.title")}
           </h1>
-          <p className="mt-4 text-pretty text-muted-foreground">{t("menu.intro")}</p>
-        </header>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-pretty font-normal text-muted-foreground sm:text-lg">
+            {t("menu.intro")}
+          </p>
+        </div>
+      </section>
 
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16">
         {cats === null ? (
-          <p className="mt-12 text-muted-foreground">{t("menu.loading")}</p>
+          <p className="py-12 text-center text-sm text-muted-foreground">{t("menu.loading")}</p>
         ) : populatedCats.length === 0 ? (
-          <p className="mt-12 rounded-2xl border border-dashed border-border bg-card/60 p-8 text-center text-muted-foreground">
+          <p className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center text-muted-foreground">
             {t("menu.empty")}
           </p>
         ) : (
-          <div className="mt-12 space-y-16">
+          <div className="space-y-16">
             {populatedCats.map((cat) => {
               const catItems = items.filter((i) => i.category_id === cat.id);
               const description = pick(cat.description_en, cat.description_sl);
@@ -181,7 +197,7 @@ function MenuPage() {
             {t("menu.offer_note.body_2")}
           </p>
         </div>
-      </section>
+      </div>
     </SiteShell>
   );
 }

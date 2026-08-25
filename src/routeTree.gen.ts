@@ -9,67 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VisitRouteImport } from './routes/visit'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as PrayerRouteImport } from './routes/prayer'
-import { Route as MenuRouteImport } from './routes/menu'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as HospitalityRouteImport } from './routes/hospitality'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as HospitalityRouteImport } from './routes/hospitality'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MenuRouteImport } from './routes/menu'
+import { Route as PrayerRouteImport } from './routes/prayer'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as VisitRouteImport } from './routes/visit'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as PPageKeyRouteImport } from './routes/p.$pageKey'
-import { Route as AdminPrayerRequestsRouteImport } from './routes/admin.prayer-requests'
-import { Route as AdminPagesRouteImport } from './routes/admin.pages'
-import { Route as AdminMenuItemsRouteImport } from './routes/admin.menu-items'
-import { Route as AdminMenuCategoriesRouteImport } from './routes/admin.menu-categories'
-import { Route as AdminHomepageRouteImport } from './routes/admin.homepage'
-import { Route as AdminEventsRouteImport } from './routes/admin.events'
-import { Route as AdminEventCategoriesRouteImport } from './routes/admin.event-categories'
 import { Route as AdminCafeStatusRouteImport } from './routes/admin.cafe-status'
+import { Route as AdminEventCategoriesRouteImport } from './routes/admin.event-categories'
+import { Route as AdminEventsRouteImport } from './routes/admin.events'
+import { Route as AdminHomepageRouteImport } from './routes/admin.homepage'
+import { Route as AdminMenuCategoriesRouteImport } from './routes/admin.menu-categories'
+import { Route as AdminMenuItemsRouteImport } from './routes/admin.menu-items'
+import { Route as AdminPagesRouteImport } from './routes/admin.pages'
+import { Route as AdminPrayerRequestsRouteImport } from './routes/admin.prayer-requests'
+import { Route as PPageKeyRouteImport } from './routes/p.$pageKey'
 import { Route as AdminPagesIndexRouteImport } from './routes/admin.pages.index'
 import { Route as AdminPagesPageKeyRouteImport } from './routes/admin.pages.$pageKey'
 
-const VisitRoute = VisitRouteImport.update({
-  id: '/visit',
-  path: '/visit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrayerRoute = PrayerRouteImport.update({
-  id: '/prayer',
-  path: '/prayer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MenuRoute = MenuRouteImport.update({
-  id: '/menu',
-  path: '/menu',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HospitalityRoute = HospitalityRouteImport.update({
-  id: '/hospitality',
-  path: '/hospitality',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -77,9 +42,44 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HospitalityRoute = HospitalityRouteImport.update({
+  id: '/hospitality',
+  path: '/hospitality',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MenuRoute = MenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrayerRoute = PrayerRouteImport.update({
+  id: '/prayer',
+  path: '/prayer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisitRoute = VisitRouteImport.update({
+  id: '/visit',
+  path: '/visit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -87,39 +87,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const PPageKeyRoute = PPageKeyRouteImport.update({
-  id: '/p/$pageKey',
-  path: '/p/$pageKey',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminPrayerRequestsRoute = AdminPrayerRequestsRouteImport.update({
-  id: '/prayer-requests',
-  path: '/prayer-requests',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPagesRoute = AdminPagesRouteImport.update({
-  id: '/pages',
-  path: '/pages',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMenuItemsRoute = AdminMenuItemsRouteImport.update({
-  id: '/menu-items',
-  path: '/menu-items',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMenuCategoriesRoute = AdminMenuCategoriesRouteImport.update({
-  id: '/menu-categories',
-  path: '/menu-categories',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminHomepageRoute = AdminHomepageRouteImport.update({
-  id: '/homepage',
-  path: '/homepage',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEventsRoute = AdminEventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+const AdminCafeStatusRoute = AdminCafeStatusRouteImport.update({
+  id: '/cafe-status',
+  path: '/cafe-status',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminEventCategoriesRoute = AdminEventCategoriesRouteImport.update({
@@ -127,10 +97,40 @@ const AdminEventCategoriesRoute = AdminEventCategoriesRouteImport.update({
   path: '/event-categories',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminCafeStatusRoute = AdminCafeStatusRouteImport.update({
-  id: '/cafe-status',
-  path: '/cafe-status',
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => AdminRoute,
+} as any)
+const AdminHomepageRoute = AdminHomepageRouteImport.update({
+  id: '/homepage',
+  path: '/homepage',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMenuCategoriesRoute = AdminMenuCategoriesRouteImport.update({
+  id: '/menu-categories',
+  path: '/menu-categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMenuItemsRoute = AdminMenuItemsRouteImport.update({
+  id: '/menu-items',
+  path: '/menu-items',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPagesRoute = AdminPagesRouteImport.update({
+  id: '/pages',
+  path: '/pages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPrayerRequestsRoute = AdminPrayerRequestsRouteImport.update({
+  id: '/prayer-requests',
+  path: '/prayer-requests',
+  getParentRoute: () => AdminRoute,
+} as any)
+const PPageKeyRoute = PPageKeyRouteImport.update({
+  id: '/p/$pageKey',
+  path: '/p/$pageKey',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminPagesIndexRoute = AdminPagesIndexRouteImport.update({
   id: '/',
@@ -303,60 +303,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/visit': {
-      id: '/visit'
-      path: '/visit'
-      fullPath: '/visit'
-      preLoaderRoute: typeof VisitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/prayer': {
-      id: '/prayer'
-      path: '/prayer'
-      fullPath: '/prayer'
-      preLoaderRoute: typeof PrayerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/menu': {
-      id: '/menu'
-      path: '/menu'
-      fullPath: '/menu'
-      preLoaderRoute: typeof MenuRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hospitality': {
-      id: '/hospitality'
-      path: '/hospitality'
-      fullPath: '/hospitality'
-      preLoaderRoute: typeof HospitalityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -366,11 +317,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hospitality': {
+      id: '/hospitality'
+      path: '/hospitality'
+      fullPath: '/hospitality'
+      preLoaderRoute: typeof HospitalityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/menu': {
+      id: '/menu'
+      path: '/menu'
+      fullPath: '/menu'
+      preLoaderRoute: typeof MenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prayer': {
+      id: '/prayer'
+      path: '/prayer'
+      fullPath: '/prayer'
+      preLoaderRoute: typeof PrayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visit': {
+      id: '/visit'
+      path: '/visit'
+      fullPath: '/visit'
+      preLoaderRoute: typeof VisitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -380,53 +380,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/p/$pageKey': {
-      id: '/p/$pageKey'
-      path: '/p/$pageKey'
-      fullPath: '/p/$pageKey'
-      preLoaderRoute: typeof PPageKeyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/prayer-requests': {
-      id: '/admin/prayer-requests'
-      path: '/prayer-requests'
-      fullPath: '/admin/prayer-requests'
-      preLoaderRoute: typeof AdminPrayerRequestsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pages': {
-      id: '/admin/pages'
-      path: '/pages'
-      fullPath: '/admin/pages'
-      preLoaderRoute: typeof AdminPagesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/menu-items': {
-      id: '/admin/menu-items'
-      path: '/menu-items'
-      fullPath: '/admin/menu-items'
-      preLoaderRoute: typeof AdminMenuItemsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/menu-categories': {
-      id: '/admin/menu-categories'
-      path: '/menu-categories'
-      fullPath: '/admin/menu-categories'
-      preLoaderRoute: typeof AdminMenuCategoriesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/homepage': {
-      id: '/admin/homepage'
-      path: '/homepage'
-      fullPath: '/admin/homepage'
-      preLoaderRoute: typeof AdminHomepageRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/events': {
-      id: '/admin/events'
-      path: '/events'
-      fullPath: '/admin/events'
-      preLoaderRoute: typeof AdminEventsRouteImport
+    '/admin/cafe-status': {
+      id: '/admin/cafe-status'
+      path: '/cafe-status'
+      fullPath: '/admin/cafe-status'
+      preLoaderRoute: typeof AdminCafeStatusRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/event-categories': {
@@ -436,12 +394,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/cafe-status': {
-      id: '/admin/cafe-status'
-      path: '/cafe-status'
-      fullPath: '/admin/cafe-status'
-      preLoaderRoute: typeof AdminCafeStatusRouteImport
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/admin/homepage': {
+      id: '/admin/homepage'
+      path: '/homepage'
+      fullPath: '/admin/homepage'
+      preLoaderRoute: typeof AdminHomepageRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/menu-categories': {
+      id: '/admin/menu-categories'
+      path: '/menu-categories'
+      fullPath: '/admin/menu-categories'
+      preLoaderRoute: typeof AdminMenuCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/menu-items': {
+      id: '/admin/menu-items'
+      path: '/menu-items'
+      fullPath: '/admin/menu-items'
+      preLoaderRoute: typeof AdminMenuItemsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pages': {
+      id: '/admin/pages'
+      path: '/pages'
+      fullPath: '/admin/pages'
+      preLoaderRoute: typeof AdminPagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/prayer-requests': {
+      id: '/admin/prayer-requests'
+      path: '/prayer-requests'
+      fullPath: '/admin/prayer-requests'
+      preLoaderRoute: typeof AdminPrayerRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/p/$pageKey': {
+      id: '/p/$pageKey'
+      path: '/p/$pageKey'
+      fullPath: '/p/$pageKey'
+      preLoaderRoute: typeof PPageKeyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/pages/': {
       id: '/admin/pages/'
@@ -516,3 +516,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
