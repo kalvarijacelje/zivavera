@@ -1,16 +1,35 @@
 import { supabase } from "@/integrations/supabase/client";
+import { compressImageFile } from "@/lib/imageCompression";
+import { getMediaUrl } from "@/lib/cdn";
 
 const BUCKET = "media";
 
 export type MediaFolder = "menu" | "events" | "homepage" | "pages";
 
 export async function uploadMedia(file: File, folder: MediaFolder): Promise<string> {
-  const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+  let fileToUpload = file;
+  
+  // Automatically compress images client-side before upload
+  if (file.type.startsWith("image/") && !file.type.includes("svg") && !file.type.includes("gif")) {
+    try {
+      fileToUpload = await compressImageFile(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.82,
+        mimeType: "image/webp",
+      });
+    } catch (err) {
+      console.warn("Client-side compression fallback to original:", err);
+      fileToUpload = file;
+    }
+  }
+
+  const ext = fileToUpload.name.split(".").pop()?.toLowerCase() || "bin";
   const path = `${folder}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+  const { error } = await supabase.storage.from(BUCKET).upload(path, fileToUpload, {
     cacheControl: "3600",
     upsert: false,
-    contentType: file.type,
+    contentType: fileToUpload.type,
   });
   if (error) throw error;
   return path;
