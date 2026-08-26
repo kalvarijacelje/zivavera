@@ -30,7 +30,7 @@ const links: { to: string; label: string; icon: typeof LayoutDashboard; exact?: 
 
 function AdminLayout() {
   const navigate = useNavigate();
-  const { session, loading } = useSession();
+  const { session, fullName, loading } = useSession();
   const isAdmin = useIsAdmin(session?.user.id);
 
   if (loading || (session && isAdmin === null)) {
@@ -104,7 +104,10 @@ function AdminLayout() {
               <ExternalLink className="size-4" />
               View site
             </Link>
-            <div className="mb-2 px-1 text-xs text-muted-foreground">{session.user.email}</div>
+            <div className="mb-2 px-1">
+              {fullName && <div className="text-xs font-bold text-foreground truncate">{fullName}</div>}
+              <div className="text-[11px] text-muted-foreground truncate">{session.user.email}</div>
+            </div>
             <Button
               variant="ghost"
               size="sm"

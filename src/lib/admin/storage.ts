@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { compressImageFile } from "@/lib/imageCompression";
+import { optimizeImageFile } from "@/lib/imageOptimizer";
 import { getMediaUrl } from "@/lib/cdn";
 
 const BUCKET = "media";
@@ -9,17 +9,16 @@ export type MediaFolder = "menu" | "events" | "homepage" | "pages";
 export async function uploadMedia(file: File, folder: MediaFolder): Promise<string> {
   let fileToUpload = file;
   
-  // Automatically compress images client-side before upload
+  // Automatically optimize images client-side before upload (<400KB, max 1920px, WebP)
   if (file.type.startsWith("image/") && !file.type.includes("svg") && !file.type.includes("gif")) {
     try {
-      fileToUpload = await compressImageFile(file, {
-        maxWidth: 1920,
-        maxHeight: 1920,
-        quality: 0.82,
+      fileToUpload = await optimizeImageFile(file, {
+        maxWidthOrHeight: 1920,
+        maxSizeMB: 0.4,
         mimeType: "image/webp",
       });
     } catch (err) {
-      console.warn("Client-side compression fallback to original:", err);
+      console.warn("Client-side optimization fallback to original:", err);
       fileToUpload = file;
     }
   }
