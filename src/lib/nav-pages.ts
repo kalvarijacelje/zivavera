@@ -21,30 +21,43 @@ const DEFAULT_NAV_PAGES: NavPage[] = [
   { page_key: "hospitality", title_en: "Hospitality Policy", title_sl: "Politika gostoljubnosti", nav_order: 30, is_built_in: true },
 ];
 
+let cachedNavPagesPromise: Promise<NavPage[]> | null = null;
+let lastFetchTime = 0;
+const NAV_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 /**
  * Fetches the ordered list of static pages that should appear in public
  * header/footer navigation. Both menus consume this same source so they
- * stay aligned by default.
+ * stay aligned by default. Uses 5-minute memory cache to prevent duplicate egress.
  */
-export async function fetchNavPages(): Promise<NavPage[]> {
-  const { data, error } = await supabase
-    .from("static_pages")
-    .select("page_key, title_en, title_sl, nav_order")
-    .eq("published", true)
-    .eq("show_in_navigation", true)
-    .order("nav_order")
-    .order("title_en");
-  if (error || !data || data.length === 0) return DEFAULT_NAV_PAGES;
-  return data.map((p) => ({
-    page_key: p.page_key,
-    title_en:
-      p.page_key === "about" && (!p.title_en || p.title_en.toLowerCase() === "about us" || p.title_en.toLowerCase() === "about")
-        ? "Get to know us"
-        : p.title_en,
-    title_sl: p.title_sl,
-    nav_order: p.nav_order ?? 0,
-    is_built_in: BUILT_IN_PAGE_KEYS.has(p.page_key),
-  }));
+export async function fetchNavPages(forceFresh = false): Promise<NavPage[]> {
+  const now = Date.now();
+  if (!forceFresh && cachedNavPagesPromise && (now - lastFetchTime < NAV_CACHE_TTL)) {
+    return cachedNavPagesPromise;
+  }
+  lastFetchTime = now;
+  cachedNavPagesPromise = (async () => {
+    const { data, error } = await supabase
+      .from("static_pages")
+      .select("page_key, title_en, title_sl, nav_order")
+      .eq("published", true)
+      .eq("show_in_navigation", true)
+      .order("nav_order")
+      .order("title_en")
+      .limit(30);
+    if (error || !data || data.length === 0) return DEFAULT_NAV_PAGES;
+    return data.map((p) => ({
+      page_key: p.page_key,
+      title_en:
+        p.page_key === "about" && (!p.title_en || p.title_en.toLowerCase() === "about us" || p.title_en.toLowerCase() === "about")
+          ? "Get to know us"
+          : p.title_en,
+      title_sl: p.title_sl,
+      nav_order: p.nav_order ?? 0,
+      is_built_in: BUILT_IN_PAGE_KEYS.has(p.page_key),
+    }));
+  })();
+  return cachedNavPagesPromise;
 }
 
 export function useNavPages() {

@@ -80,8 +80,13 @@ function MenuItemsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     const [cRes, iRes] = await Promise.all([
-      supabase.from("menu_categories").select("id, name_en").order("sort_order"),
-      supabase.from("menu_items").select("*").order("sort_order").order("name_en"),
+      supabase.from("menu_categories").select("id, name_en").order("sort_order").limit(100),
+      supabase
+        .from("menu_items")
+        .select("id, category_id, name_en, name_sl, description_en, description_sl, image_path, featured, available, sort_order, published")
+        .order("sort_order")
+        .order("name_en")
+        .limit(150),
     ]);
     if (cRes.error) toast.error(cRes.error.message);
     if (iRes.error) toast.error(iRes.error.message);

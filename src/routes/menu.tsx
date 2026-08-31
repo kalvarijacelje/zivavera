@@ -62,7 +62,8 @@ function MenuPage() {
           .select("id,name_en,name_sl,description_en,description_sl,sort_order")
           .eq("published", true)
           .order("sort_order")
-          .order("name_en"),
+          .order("name_en")
+          .limit(50),
         supabase
           .from("menu_items")
           .select(
@@ -70,7 +71,8 @@ function MenuPage() {
           )
           .eq("published", true)
           .order("sort_order")
-          .order("name_en"),
+          .order("name_en")
+          .limit(100),
       ]);
       if (!alive) return;
       setCats((c.data as Category[]) ?? []);

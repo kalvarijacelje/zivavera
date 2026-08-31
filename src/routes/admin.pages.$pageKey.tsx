@@ -111,7 +111,7 @@ function PageEditor() {
     setLoading(true);
     const { data: p, error: pErr } = await supabase
       .from("static_pages")
-      .select("*")
+      .select("id, page_key, internal_label, title_en, title_sl, published, show_in_navigation, nav_order")
       .eq("page_key", pageKey)
       .maybeSingle();
     if (pErr || !p) {
@@ -128,9 +128,10 @@ function PageEditor() {
 
     const { data: s } = await supabase
       .from("static_page_sections")
-      .select("*")
+      .select("id, page_id, section_type, internal_label, sort_order, published, eyebrow_en, eyebrow_sl, title_en, title_sl, subtitle_en, subtitle_sl, body_en, body_sl, image_path, button_text_en, button_text_sl, button_link, layout_variant, bullets, items")
       .eq("page_id", pageRow.id)
-      .order("sort_order");
+      .order("sort_order")
+      .limit(50);
     setSections(
       ((s ?? []) as unknown as StaticPageSection[]).map((row) => ({
         ...row,

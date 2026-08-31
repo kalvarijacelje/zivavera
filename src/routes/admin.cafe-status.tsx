@@ -88,7 +88,7 @@ function CafeStatusAdmin() {
         .from("cafe_sessions")
         .select("id,opened_at,closed_at,opened_by_email,closed_by_email,hot_drinks_served,cold_drinks_served,people_served,note")
         .order("opened_at", { ascending: false })
-        .limit(500),
+        .limit(50),
     ]);
     if (s) {
       setStatus(s as Status);

@@ -6,19 +6,23 @@ export function SignedImage({
   path,
   className,
   alt = "",
+  width = 800,
+  quality = 80,
 }: {
   path: string | null | undefined;
   className?: string;
   alt?: string;
+  width?: number;
+  quality?: number;
 }) {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {
     let active = true;
-    getSignedMediaUrl(path).then((u) => active && setUrl(u));
+    getSignedMediaUrl(path, { width, quality }).then((u) => active && setUrl(u));
     return () => {
       active = false;
     };
-  }, [path]);
+  }, [path, width, quality]);
 
   if (!path) {
     return (

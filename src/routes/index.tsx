@@ -239,9 +239,10 @@ function HomePage() {
     (async () => {
       const { data } = await supabase
         .from("homepage_sections")
-        .select("*")
+        .select("id, section_type, sort_order, eyebrow_en, eyebrow_sl, title_en, title_sl, subtitle_en, subtitle_sl, body_en, body_sl, image_path, default_image_key, image_alignment, button_text_en, button_text_sl, button_link, secondary_button_text_en, secondary_button_text_sl, secondary_button_link, featured_menu_item_ids, featured_event_ids, value_cards")
         .eq("published", true)
-        .order("sort_order");
+        .order("sort_order")
+        .limit(20);
       if (!alive) return;
       if (data && data.length > 0) {
         const list = data as Section[];

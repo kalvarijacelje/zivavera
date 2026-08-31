@@ -89,8 +89,13 @@ function EventsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     const [cRes, eRes] = await Promise.all([
-      supabase.from("event_categories").select("id, name_en").order("sort_order"),
-      supabase.from("events").select("*").order("sort_order").order("event_date"),
+      supabase.from("event_categories").select("id, name_en").order("sort_order").limit(100),
+      supabase
+        .from("events")
+        .select("id, category_id, title_en, title_sl, description_en, description_sl, event_date, event_time, location_or_note_en, location_or_note_sl, image_path, image_alignment, featured, sort_order, published")
+        .order("sort_order")
+        .order("event_date")
+        .limit(150),
     ]);
     if (cRes.error) toast.error(cRes.error.message);
     if (eRes.error) toast.error(eRes.error.message);

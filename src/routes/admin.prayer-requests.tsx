@@ -96,8 +96,9 @@ function PrayerRequestsAdmin() {
     setLoading(true);
     let q = supabase
       .from("prayer_requests")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("id, created_at, name, contact, message, request_type, visibility_choice, is_anonymous, status, moderator_note, public_response, public_response_at")
+      .order("created_at", { ascending: false })
+      .limit(50);
     if (filter !== "all") q = q.eq("status", filter);
     const { data, error } = await q;
     if (error) toast.error(error.message);

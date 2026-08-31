@@ -41,24 +41,49 @@ export async function deleteMedia(path: string | null | undefined) {
 
 const signedCache = new Map<string, { url: string; expires: number }>();
 
-export async function getSignedMediaUrl(path: string | null | undefined): Promise<string | null> {
+export interface MediaUrlOptions {
+  width?: number;
+  quality?: number;
+  resize?: 'cover' | 'contain';
+}
+
+export async function getSignedMediaUrl(
+  path: string | null | undefined,
+  options?: MediaUrlOptions
+): Promise<string | null> {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
     return path;
   }
+  const cacheKey = options ? `${path}?w=${options.width || ''}&q=${options.quality || ''}&r=${options.resize || ''}` : path;
   const now = Date.now();
-  const cached = signedCache.get(path);
+  const cached = signedCache.get(cacheKey);
   if (cached && cached.expires > now + 60_000) return cached.url;
-  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600);
+
+  const transform = options && (options.width || options.quality)
+    ? {
+        transform: {
+          width: options.width,
+          quality: options.quality || 80,
+          resize: options.resize || 'cover',
+        }
+      }
+    : undefined;
+
+  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600, transform as any);
   if (error || !data) {
-    signedCache.delete(path);
+    signedCache.delete(cacheKey);
     return null;
   }
-  signedCache.set(path, { url: data.signedUrl, expires: now + 55 * 60_000 });
+  signedCache.set(cacheKey, { url: data.signedUrl, expires: now + 55 * 60_000 });
   return data.signedUrl;
 }
 
 export function invalidateSignedMediaUrl(path: string | null | undefined) {
   if (!path) return;
-  signedCache.delete(path);
+  for (const k of signedCache.keys()) {
+    if (k === path || k.startsWith(`${path}?`)) {
+      signedCache.delete(k);
+    }
+  }
 }

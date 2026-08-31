@@ -78,10 +78,11 @@ function PagesAdmin() {
     // grouped by their internal label.
     const { data, error } = await supabase
       .from("static_pages")
-      .select("*")
+      .select("id, page_key, internal_label, title_en, title_sl, published, show_in_navigation, nav_order")
       .order("show_in_navigation", { ascending: false })
       .order("nav_order")
-      .order("internal_label");
+      .order("internal_label")
+      .limit(50);
     if (error) toast.error(error.message);
     else setRows((data as unknown as StaticPage[]) ?? []);
     setLoading(false);

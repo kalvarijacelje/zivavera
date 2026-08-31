@@ -100,7 +100,7 @@ export type StaticPage = {
 export async function fetchStaticPageByKey(pageKey: string) {
   const { data: page, error: pErr } = await supabase
     .from("static_pages")
-    .select("*")
+    .select("id, page_key, internal_label, title_en, title_sl, published, show_in_navigation, nav_order")
     .eq("page_key", pageKey)
     .eq("published", true)
     .maybeSingle();
@@ -114,10 +114,11 @@ export async function fetchStaticPageByKey(pageKey: string) {
 
   const { data: sections } = await supabase
     .from("static_page_sections")
-    .select("*")
+    .select("id, page_id, section_type, internal_label, sort_order, published, eyebrow_en, eyebrow_sl, title_en, title_sl, subtitle_en, subtitle_sl, body_en, body_sl, image_path, button_text_en, button_text_sl, button_link, layout_variant, bullets, items")
     .eq("page_id", page.id)
     .eq("published", true)
-    .order("sort_order");
+    .order("sort_order")
+    .limit(50);
 
   const mappedSections: StaticPageSection[] = ((sections ?? []) as unknown as StaticPageSection[]).map((s) => {
     // If the about page has a legacy duplicate homepage hero, update it to the new unique copy

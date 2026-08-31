@@ -65,7 +65,8 @@ function EventsPage() {
           .select("id,name_en,name_sl,description_en,description_sl,sort_order")
           .eq("published", true)
           .order("sort_order")
-          .order("name_en"),
+          .order("name_en")
+          .limit(50),
         supabase
           .from("events")
           .select(
@@ -73,7 +74,8 @@ function EventsPage() {
           )
           .eq("published", true)
           .order("sort_order")
-          .order("event_date"),
+          .order("event_date")
+          .limit(100),
       ]);
       if (!alive) return;
       setCats((c.data as Category[]) ?? []);
