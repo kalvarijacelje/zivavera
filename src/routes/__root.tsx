@@ -81,13 +81,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "ŽIVA VERA — a Christian non-profit coffee shop in Slovenia. Good coffee, real conversation, sincere hospitality.",
+          "ŽIVA VERA — prva krščanska neprofitna kavarna v Sloveniji. Dobra kava, pristni pogovori in iskrena gostoljubnost.",
       },
       { property: "og:title", content: "ŽIVA VERA — Kavarna" },
       {
         property: "og:description",
         content:
-          "A unique café that runs on faith. Good coffee, real conversation, sincere hospitality.",
+          "Unikatna kavarna, ki deluje po veri. Dobra kava, pristen pogovor in iskreno gostoljubje.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -95,7 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "twitter:description",
         content:
-          "A unique café that runs on faith. Good coffee, real conversation, sincere hospitality.",
+          "Unikatna kavarna, ki deluje po veri. Dobra kava, pristen pogovor in iskreno gostoljubje.",
       },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/QJ6qy9IPYHZYBkJNlfTU0gtTOef2/social-images/social-1780263119063-ziva_vera_bela.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/QJ6qy9IPYHZYBkJNlfTU0gtTOef2/social-images/social-1780263119063-ziva_vera_bela.webp" },

@@ -1,5 +1,5 @@
 import { createIsomorphicFn } from "@tanstack/react-start";
-import { getCookie, getRequestHeader } from "@tanstack/react-start/server";
+import { getCookie } from "@tanstack/react-start/server";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "./translations";
 
 export const LOCALE_COOKIE = "ziva-vera.locale";
@@ -28,7 +28,10 @@ function fromCookieHeader(header: string | undefined | null): Locale | null {
 /**
  * Resolve the active locale synchronously on both server (SSR) and client
  * (browser), before first render. Order: explicit cookie → localStorage
- * (client only) → Accept-Language / navigator.language → DEFAULT_LOCALE.
+ * (client only) → DEFAULT_LOCALE ("sl").
+ *
+ * We intentionally do NOT auto-detect from Accept-Language or navigator.language
+ * so every first-time visitor lands on the Slovenian site by default.
  */
 export const resolveInitialLocale = createIsomorphicFn()
   .server((): Locale => {
@@ -36,9 +39,7 @@ export const resolveInitialLocale = createIsomorphicFn()
     if (cookie && (SUPPORTED_LOCALES as readonly string[]).includes(cookie)) {
       return cookie as Locale;
     }
-    const accept = getRequestHeader("accept-language");
-    const first = accept?.split(",")[0]?.trim();
-    return normalize(first) ?? DEFAULT_LOCALE;
+    return DEFAULT_LOCALE;
   })
   .client((): Locale => {
     if (typeof document !== "undefined") {
@@ -54,8 +55,6 @@ export const resolveInitialLocale = createIsomorphicFn()
       } catch {
         /* ignore */
       }
-      const nav = normalize(window.navigator.language);
-      if (nav) return nav;
     }
     return DEFAULT_LOCALE;
   });
