@@ -5,13 +5,13 @@ import { StaticPageRenderer } from "@/components/StaticPageRenderer";
 export const Route = createFileRoute("/hospitality")({
   head: () => ({
     meta: [
-      { title: "Naša zaveza skupnosti / Our Commitment to Community — ŽIVA VERA" },
+      { title: "Naše gostoljubje / Our Hospitality — ŽIVA VERA" },
       {
         name: "description",
         content:
           "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.",
       },
-      { property: "og:title", content: "Naša zaveza skupnosti — ŽIVA VERA" },
+      { property: "og:title", content: "Naše gostoljubje — ŽIVA VERA" },
       {
         property: "og:description",
         content:

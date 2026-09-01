@@ -99,8 +99,8 @@ const BUILT_IN_PAGE_DEFAULTS: Record<
   },
   hospitality: {
     internal_label: "Hospitality",
-    title_sl: "Naša zaveza skupnosti",
-    title_en: "Our Commitment to Community",
+    title_sl: "Naše gostoljubje",
+    title_en: "Our Hospitality",
     show_in_navigation: true,
     nav_order: 30,
   },
@@ -231,17 +231,19 @@ function PageEditor() {
       const isLegacyTitle =
         pageRow.title_sl === "Politika gostoljubnosti" ||
         pageRow.title_sl === "Politika gostoljubnosti in postrežbe" ||
+        pageRow.title_sl === "Naša zaveza skupnosti" ||
         pageRow.title_en === "Hospitality Policy" ||
         pageRow.title_en === "Hospitality and Service Policy" ||
+        pageRow.title_en === "Our Commitment to Community" ||
         pageRow.title_sl === "Gostoljubnost" ||
         pageRow.title_en === "Hospitality";
 
       if (isLegacyTitle) {
-        pageRow.title_sl = "Naša zaveza skupnosti";
-        pageRow.title_en = "Our Commitment to Community";
+        pageRow.title_sl = "Naše gostoljubje";
+        pageRow.title_en = "Our Hospitality";
         supabase
           .from("static_pages")
-          .update({ title_sl: "Naša zaveza skupnosti", title_en: "Our Commitment to Community" })
+          .update({ title_sl: "Naše gostoljubje", title_en: "Our Hospitality" })
           .eq("id", pageRow.id)
           .then();
       }
@@ -268,15 +270,17 @@ function PageEditor() {
           const isLegacy =
             row.title_sl === "Politika gostoljubnosti" ||
             row.title_sl === "Politika gostoljubnosti in postrežbe" ||
+            row.title_sl === "Naša zaveza skupnosti" ||
             row.title_en === "Hospitality Policy" ||
             row.title_en === "Hospitality and Service Policy" ||
+            row.title_en === "Our Commitment to Community" ||
             row.eyebrow_sl === "Naša zaveza gostom in skupnosti" ||
             row.eyebrow_en === "Our commitment to guests and community" ||
             (row.subtitle_sl && row.subtitle_sl.includes("Krščanske cerkve Kalvarija"));
 
           if (isLegacy) {
-            row.title_sl = "Naša zaveza skupnosti";
-            row.title_en = "Our Commitment to Community";
+            row.title_sl = "Naše gostoljubje";
+            row.title_en = "Our Hospitality";
             row.eyebrow_sl = "Naše gostoljubje";
             row.eyebrow_en = "Our Hospitality";
             row.subtitle_sl = "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.";

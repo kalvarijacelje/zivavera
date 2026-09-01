@@ -59,8 +59,8 @@ const DEFAULT_PAGE_HEROES: Record<string, PageHeroConfig> = {
     image: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1920&q=80",
     eyebrow_sl: "Naše gostoljubje",
     eyebrow_en: "Our Hospitality",
-    title_sl: "Naša zaveza skupnosti",
-    title_en: "Our Commitment to Community",
+    title_sl: "Naše gostoljubje",
+    title_en: "Our Hospitality",
     subtitle_sl: "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.",
     subtitle_en: "ŽIVA VERA is a non-profit café that operates as a mission of Calvary Chapel Celje. Our work is built on volunteer effort, the voluntary contributions of our guests, and the desire to create a warm, safe and respectful space for everyone.",
   },
@@ -249,8 +249,10 @@ export function StaticPageRenderer({
     ((pageKey === "hospitality" &&
       (rawHeroSection.title_sl === "Politika gostoljubnosti" ||
         rawHeroSection.title_sl === "Politika gostoljubnosti in postrežbe" ||
+        rawHeroSection.title_sl === "Naša zaveza skupnosti" ||
         rawHeroSection.title_en === "Hospitality Policy" ||
         rawHeroSection.title_en === "Hospitality and Service Policy" ||
+        rawHeroSection.title_en === "Our Commitment to Community" ||
         rawHeroSection.eyebrow_sl === "Naša zaveza gostom in skupnosti" ||
         rawHeroSection.eyebrow_en === "Our commitment to guests and community" ||
         (rawHeroSection.subtitle_sl && rawHeroSection.subtitle_sl.includes("Krščanske cerkve Kalvarija")))) ||
@@ -267,8 +269,10 @@ export function StaticPageRenderer({
     pageKey === "hospitality" &&
     (page.title_sl === "Politika gostoljubnosti" ||
       page.title_sl === "Politika gostoljubnosti in postrežbe" ||
+      page.title_sl === "Naša zaveza skupnosti" ||
       page.title_en === "Hospitality Policy" ||
-      page.title_en === "Hospitality and Service Policy");
+      page.title_en === "Hospitality and Service Policy" ||
+      page.title_en === "Our Commitment to Community");
 
   const pageTitle =
     isLegacyPage && defaultHero

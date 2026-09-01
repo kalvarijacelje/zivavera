@@ -51,7 +51,9 @@ export function SiteFooter() {
               const label =
                 p.page_key === "about" && (!p.title_en || p.title_en.toLowerCase() === "about us" || p.title_en.toLowerCase() === "about")
                   ? (locale === "sl" ? (p.title_sl || "Spoznajte nas") : "Get to know us")
-                  : (tField({ en: p.title_en, sl: p.title_sl }) ?? p.page_key);
+                  : p.page_key === "hospitality"
+                    ? (locale === "sl" ? "Naše gostoljubje" : "Our Hospitality")
+                    : (tField({ en: p.title_en, sl: p.title_sl }) ?? p.page_key);
               if (p.is_built_in) {
                 const to =
                   p.page_key === "about"

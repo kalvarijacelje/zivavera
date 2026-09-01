@@ -146,7 +146,9 @@ export function SiteHeader() {
                   const label =
                     p.page_key === "about" && (!p.title_en || p.title_en.toLowerCase() === "about us" || p.title_en.toLowerCase() === "about")
                       ? (locale === "sl" ? (p.title_sl || "Spoznajte nas") : "Get to know us")
-                      : (tField({ en: p.title_en, sl: p.title_sl }) ?? p.page_key);
+                      : p.page_key === "hospitality"
+                        ? (locale === "sl" ? "Naše gostoljubje" : "Our Hospitality")
+                        : (tField({ en: p.title_en, sl: p.title_sl }) ?? p.page_key);
                   const href = publicHrefForPage(p.page_key);
                   return (
                     <DropdownMenuItem key={p.page_key} asChild className="cursor-pointer">
@@ -291,7 +293,9 @@ export function SiteHeader() {
                     const label =
                       p.page_key === "about" && (!p.title_en || p.title_en.toLowerCase() === "about us" || p.title_en.toLowerCase() === "about")
                         ? (locale === "sl" ? (p.title_sl || "Spoznajte nas") : "Get to know us")
-                        : (tField({ en: p.title_en, sl: p.title_sl }) ?? p.page_key);
+                        : p.page_key === "hospitality"
+                          ? (locale === "sl" ? "Naše gostoljubje" : "Our Hospitality")
+                          : (tField({ en: p.title_en, sl: p.title_sl }) ?? p.page_key);
                     const href = publicHrefForPage(p.page_key);
                     return (
                       <Link

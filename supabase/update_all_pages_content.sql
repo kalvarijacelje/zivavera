@@ -8,7 +8,7 @@ INSERT INTO public.static_pages (page_key, internal_label, title_sl, title_en, s
 VALUES
   ('about', 'About Us', 'Spoznajte nas', 'Get to know us', true, 10, true),
   ('ebenezer', 'Ebenezer Grace', 'Ebenezer Grace', 'Ebenezer Grace', true, 20, true),
-  ('hospitality', 'Hospitality', 'Naša zaveza skupnosti', 'Our Commitment to Community', true, 30, true),
+  ('hospitality', 'Hospitality', 'Naše gostoljubje', 'Our Hospitality', true, 30, true),
   ('visit', 'Visit & Contribute', 'Obisk in prispevek', 'Visit & Contribution', true, 40, true),
   ('prayer', 'Prayer & Reflection', 'Molitev in razmišljanje', 'Prayer & Reflection', true, 50, true)
 ON CONFLICT (page_key) DO UPDATE SET
@@ -326,7 +326,7 @@ INSERT INTO public.static_page_sections (
   );
 
 -- ====================================================================
--- 5. HOSPITALITY POLICY SECTIONS (/hospitality) - 100% COMPLETE ORIGINAL
+-- 5. OUR HOSPITALITY SECTIONS (/hospitality) - 100% COMPLETE ORIGINAL
 -- ====================================================================
 INSERT INTO public.static_page_sections (
   page_id, section_type, internal_label, sort_order, published,
@@ -337,7 +337,7 @@ INSERT INTO public.static_page_sections (
     (SELECT id FROM public.static_pages WHERE page_key = 'hospitality' LIMIT 1),
     'hero', 'Hospitality Hero', 10, true,
     $$Naše gostoljubje$$, $$Our Hospitality$$,
-    $$Naša zaveza skupnosti$$, $$Our Commitment to Community$$,
+    $$Naše gostoljubje$$, $$Our Hospitality$$,
     $$ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.$$,
     $$ŽIVA VERA is a non-profit café that operates as a mission of Calvary Chapel Celje. Our work is built on volunteer effort, the voluntary contributions of our guests, and the desire to create a warm, safe and respectful space for everyone.$$,
     null, null,

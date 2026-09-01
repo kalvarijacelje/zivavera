@@ -116,14 +116,16 @@ export async function fetchStaticPageByKey(pageKey: string) {
     const isLegacyHospitalityPage =
       page.title_sl === "Politika gostoljubnosti" ||
       page.title_sl === "Politika gostoljubnosti in postrežbe" ||
+      page.title_sl === "Naša zaveza skupnosti" ||
       page.title_en === "Hospitality Policy" ||
-      page.title_en === "Hospitality and Service Policy";
+      page.title_en === "Hospitality and Service Policy" ||
+      page.title_en === "Our Commitment to Community";
     if (isLegacyHospitalityPage) {
-      page.title_sl = "Naša zaveza skupnosti";
-      page.title_en = "Our Commitment to Community";
+      page.title_sl = "Naše gostoljubje";
+      page.title_en = "Our Hospitality";
       supabase
         .from("static_pages")
-        .update({ title_sl: "Naša zaveza skupnosti", title_en: "Our Commitment to Community" })
+        .update({ title_sl: "Naše gostoljubje", title_en: "Our Hospitality" })
         .eq("id", page.id)
         .then();
     }
@@ -175,15 +177,17 @@ export async function fetchStaticPageByKey(pageKey: string) {
       const isLegacyHospitalityHero =
         s.title_sl === "Politika gostoljubnosti" ||
         s.title_sl === "Politika gostoljubnosti in postrežbe" ||
+        s.title_sl === "Naša zaveza skupnosti" ||
         s.title_en === "Hospitality Policy" ||
         s.title_en === "Hospitality and Service Policy" ||
+        s.title_en === "Our Commitment to Community" ||
         s.eyebrow_sl === "Naša zaveza gostom in skupnosti" ||
         s.eyebrow_en === "Our commitment to guests and community" ||
         (s.subtitle_sl && s.subtitle_sl.includes("Krščanske cerkve Kalvarija"));
 
       if (isLegacyHospitalityHero) {
-        s.title_sl = "Naša zaveza skupnosti";
-        s.title_en = "Our Commitment to Community";
+        s.title_sl = "Naše gostoljubje";
+        s.title_en = "Our Hospitality";
         s.eyebrow_sl = "Naše gostoljubje";
         s.eyebrow_en = "Our Hospitality";
         s.subtitle_sl = "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.";
