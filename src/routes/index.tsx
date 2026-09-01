@@ -283,13 +283,11 @@ function HomePage() {
 
   return (
     <SiteShell>
-      {(sections ?? []).map((s, i) => (
+      {(sections ?? []).map((s) => (
         <Fragment key={s.id}>
           <SectionRenderer section={s} menuItems={menuItems} events={events} />
-          {i === 0 && <CafeStatusBanner />}
         </Fragment>
       ))}
-      {sections && sections.length === 0 && <CafeStatusBanner />}
     </SiteShell>
   );
 }
@@ -376,7 +374,7 @@ function HeroSection({ s }: { s: Section }) {
   const btn1 = pick(s.button_text_en, s.button_text_sl);
   const btn2 = pick(s.secondary_button_text_en, s.secondary_button_text_sl);
   return (
-    <section className="relative isolate overflow-hidden min-h-[560px] flex items-center">
+    <section className="relative isolate overflow-hidden min-h-[460px] sm:min-h-[520px] flex items-center">
       <div className="absolute inset-0 z-0">
         {img && (
           <img
@@ -390,43 +388,50 @@ function HeroSection({ s }: { s: Section }) {
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/65 to-background" />
       </div>
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28 w-full">
-        {eyebrow && (
-          <p className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/80 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary backdrop-blur-sm shadow-xs">
-            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-            {eyebrow}
-          </p>
-        )}
-        {title && (
-          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.08] text-balance text-foreground sm:text-5xl md:text-6xl tracking-tight">
-            {title}
-          </h1>
-        )}
-        {subtitle && (
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-pretty font-normal text-muted-foreground sm:text-lg">
-            {subtitle}
-          </p>
-        )}
-        {(btn1 || btn2) && (
-          <div className="mt-8 flex flex-wrap items-center gap-3.5">
-            {btn1 && s.button_link && (
-              <SectionLink
-                to={s.button_link}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:-translate-y-0.5"
-              >
-                {btn1} <ArrowRight className="size-4" />
-              </SectionLink>
-            )}
-            {btn2 && s.secondary_button_link && (
-              <SectionLink
-                to={s.secondary_button_link}
-                className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/90 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition-all hover:bg-secondary hover:shadow-xs"
-              >
-                {btn2}
-              </SectionLink>
-            )}
-          </div>
-        )}
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-14 pb-8 sm:px-6 sm:pt-18 sm:pb-10 w-full flex flex-col justify-between">
+        <div>
+          {eyebrow && (
+            <p className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/80 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary backdrop-blur-sm shadow-xs">
+              <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+              {eyebrow}
+            </p>
+          )}
+          {title && (
+            <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold leading-[1.08] text-balance text-foreground sm:text-5xl md:text-6xl tracking-tight">
+              {title}
+            </h1>
+          )}
+          {subtitle && (
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-pretty font-normal text-muted-foreground sm:text-lg">
+              {subtitle}
+            </p>
+          )}
+          {(btn1 || btn2) && (
+            <div className="mt-6 flex flex-wrap items-center gap-3.5">
+              {btn1 && s.button_link && (
+                <SectionLink
+                  to={s.button_link}
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:-translate-y-0.5"
+                >
+                  {btn1} <ArrowRight className="size-4" />
+                </SectionLink>
+              )}
+              {btn2 && s.secondary_button_link && (
+                <SectionLink
+                  to={s.secondary_button_link}
+                  className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/90 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition-all hover:bg-secondary hover:shadow-xs"
+                >
+                  {btn2}
+                </SectionLink>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Compact Floating Glass Status Bar Integrated into Hero */}
+        <div className="mt-8 sm:mt-10">
+          <CafeStatusBanner />
+        </div>
       </div>
     </section>
   );

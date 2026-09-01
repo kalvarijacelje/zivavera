@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      cafe_visits: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_by_email: string | null
+          customer_id: string | null
+          donation_amount: number | null
+          donation_given: boolean
+          guest_email: string | null
+          guest_name: string
+          id: string
+          items: Json
+          notes: string | null
+          payment_method: "cash" | "card" | null
+          visited_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          customer_id?: string | null
+          donation_amount?: number | null
+          donation_given?: boolean
+          guest_email?: string | null
+          guest_name?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          payment_method?: "cash" | "card" | null
+          visited_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          customer_id?: string | null
+          donation_amount?: number | null
+          donation_given?: boolean
+          guest_email?: string | null
+          guest_name?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          payment_method?: "cash" | "card" | null
+          visited_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cafe_visits_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string | null
+          first_visited_at: string
+          id: string
+          last_visited_at: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+          visit_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          first_visited_at?: string
+          id?: string
+          last_visited_at?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          visit_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          first_visited_at?: string
+          id?: string
+          last_visited_at?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          visit_count?: number
+        }
+        Relationships: []
+      }
       cafe_sessions: {
         Row: {
           closed_at: string | null
@@ -66,6 +164,9 @@ export type Database = {
         Row: {
           id: boolean
           is_open: boolean
+          mode: "auto" | "manual_open" | "manual_closed"
+          schedule: Json
+          override_until: string | null
           note_en: string | null
           note_sl: string | null
           updated_at: string
@@ -74,6 +175,9 @@ export type Database = {
         Insert: {
           id?: boolean
           is_open?: boolean
+          mode?: "auto" | "manual_open" | "manual_closed"
+          schedule?: Json
+          override_until?: string | null
           note_en?: string | null
           note_sl?: string | null
           updated_at?: string
@@ -82,6 +186,9 @@ export type Database = {
         Update: {
           id?: boolean
           is_open?: boolean
+          mode?: "auto" | "manual_open" | "manual_closed"
+          schedule?: Json
+          override_until?: string | null
           note_en?: string | null
           note_sl?: string | null
           updated_at?: string

@@ -539,7 +539,11 @@ function SectionRenderer({
 
     case "policy_section": {
       const bullets = (section.bullets ?? [])
-        .map((b) => fieldByLocale(b.text_en, b.text_sl, locale))
+        .map((b: any) => {
+          if (typeof b === "string") return b;
+          if (b && typeof b === "object") return fieldByLocale(b.text_en, b.text_sl, locale);
+          return null;
+        })
         .filter(Boolean) as string[];
       return (
         <article className="space-y-4 text-pretty leading-relaxed text-foreground/85 max-w-3xl">

@@ -57,6 +57,17 @@ CREATE POLICY "Users can read own role" ON public.user_roles
 CREATE TABLE IF NOT EXISTS public.cafe_status (
   id boolean PRIMARY KEY DEFAULT true,
   is_open boolean NOT NULL DEFAULT false,
+  mode text NOT NULL DEFAULT 'auto' CHECK (mode IN ('auto', 'manual_open', 'manual_closed')),
+  schedule jsonb NOT NULL DEFAULT '{
+    "mon": { "enabled": true, "open": "08:00", "close": "14:00" },
+    "tue": { "enabled": true, "open": "08:00", "close": "14:00" },
+    "wed": { "enabled": true, "open": "08:00", "close": "14:00" },
+    "thu": { "enabled": true, "open": "08:00", "close": "14:00" },
+    "fri": { "enabled": true, "open": "08:00", "close": "14:00" },
+    "sat": { "enabled": false, "open": "09:00", "close": "13:00" },
+    "sun": { "enabled": false, "open": "09:00", "close": "13:00" }
+  }'::jsonb,
+  override_until timestamptz,
   note_en text,
   note_sl text,
   updated_at timestamptz NOT NULL DEFAULT now(),
@@ -114,6 +125,62 @@ DROP POLICY IF EXISTS "Admins manage cafe sessions" ON public.cafe_sessions;
 CREATE POLICY "Admins manage cafe sessions" ON public.cafe_sessions
   FOR ALL TO authenticated
   USING (public.has_role(auth.uid(), 'admin'));
+
+-- 4b. CUSTOMERS & CAFE VISITS TRACKER
+CREATE TABLE IF NOT EXISTS public.customers (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  notes TEXT,
+  first_visited_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_visited_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  visit_count INTEGER NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.cafe_visits (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  customer_id UUID REFERENCES public.customers(id) ON DELETE SET NULL,
+  guest_name TEXT NOT NULL DEFAULT 'Guest',
+  guest_email TEXT,
+  items JSONB NOT NULL DEFAULT '[]'::jsonb,
+  notes TEXT,
+  donation_given BOOLEAN NOT NULL DEFAULT false,
+  donation_amount NUMERIC(10, 2),
+  payment_method TEXT CHECK (payment_method IN ('cash', 'card') OR payment_method IS NULL),
+  visited_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_by_email TEXT
+);
+
+CREATE INDEX IF NOT EXISTS customers_name_idx ON public.customers (name);
+CREATE INDEX IF NOT EXISTS customers_last_visited_at_idx ON public.customers (last_visited_at DESC);
+CREATE INDEX IF NOT EXISTS cafe_visits_visited_at_idx ON public.cafe_visits (visited_at DESC);
+CREATE INDEX IF NOT EXISTS cafe_visits_customer_id_idx ON public.cafe_visits (customer_id);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.customers TO authenticated;
+GRANT ALL ON public.customers TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.cafe_visits TO authenticated;
+GRANT ALL ON public.cafe_visits TO service_role;
+
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cafe_visits ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Admins manage customers" ON public.customers;
+CREATE POLICY "Admins manage customers" ON public.customers
+  FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+DROP POLICY IF EXISTS "Admins manage cafe visits" ON public.cafe_visits;
+CREATE POLICY "Admins manage cafe visits" ON public.cafe_visits
+  FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
 
 -- 5. MENU CATEGORIES & ITEMS
 CREATE TABLE IF NOT EXISTS public.menu_categories (

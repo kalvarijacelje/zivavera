@@ -21,6 +21,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as VisitRouteImport } from './routes/visit'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCafeStatusRouteImport } from './routes/admin.cafe-status'
+import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminEventCategoriesRouteImport } from './routes/admin.event-categories'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminHomepageRouteImport } from './routes/admin.homepage'
@@ -92,6 +93,11 @@ const AdminCafeStatusRoute = AdminCafeStatusRouteImport.update({
   path: '/cafe-status',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCustomersRoute = AdminCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEventCategoriesRoute = AdminEventCategoriesRouteImport.update({
   id: '/event-categories',
   path: '/event-categories',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
   '/admin/cafe-status': typeof AdminCafeStatusRoute
+  '/admin/customers': typeof AdminCustomersRoute
   '/admin/event-categories': typeof AdminEventCategoriesRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/homepage': typeof AdminHomepageRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
   '/admin/cafe-status': typeof AdminCafeStatusRoute
+  '/admin/customers': typeof AdminCustomersRoute
   '/admin/event-categories': typeof AdminEventCategoriesRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/homepage': typeof AdminHomepageRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
   '/admin/cafe-status': typeof AdminCafeStatusRoute
+  '/admin/customers': typeof AdminCustomersRoute
   '/admin/event-categories': typeof AdminEventCategoriesRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/homepage': typeof AdminHomepageRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/visit'
     | '/admin/cafe-status'
+    | '/admin/customers'
     | '/admin/event-categories'
     | '/admin/events'
     | '/admin/homepage'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/visit'
     | '/admin/cafe-status'
+    | '/admin/customers'
     | '/admin/event-categories'
     | '/admin/events'
     | '/admin/homepage'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/visit'
     | '/admin/cafe-status'
+    | '/admin/customers'
     | '/admin/event-categories'
     | '/admin/events'
     | '/admin/homepage'
@@ -387,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCafeStatusRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/customers': {
+      id: '/admin/customers'
+      path: '/customers'
+      fullPath: '/admin/customers'
+      preLoaderRoute: typeof AdminCustomersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/event-categories': {
       id: '/admin/event-categories'
       path: '/event-categories'
@@ -476,6 +495,7 @@ const AdminPagesRouteWithChildren = AdminPagesRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminCafeStatusRoute: typeof AdminCafeStatusRoute
+  AdminCustomersRoute: typeof AdminCustomersRoute
   AdminEventCategoriesRoute: typeof AdminEventCategoriesRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminHomepageRoute: typeof AdminHomepageRoute
@@ -488,6 +508,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCafeStatusRoute: AdminCafeStatusRoute,
+  AdminCustomersRoute: AdminCustomersRoute,
   AdminEventCategoriesRoute: AdminEventCategoriesRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminHomepageRoute: AdminHomepageRoute,

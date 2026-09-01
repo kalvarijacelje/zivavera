@@ -39,6 +39,18 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const msg =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : error && typeof error === "object" && "message" in error
+          ? String((error as { message: unknown }).message)
+          : error
+            ? JSON.stringify(error)
+            : "";
+  const name = error instanceof Error ? error.name : "Error";
+  const stack = error instanceof Error ? error.stack : null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -49,6 +61,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
+        {msg ? (
+          <div className="mt-4 max-h-48 overflow-auto rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-left font-mono text-xs text-destructive">
+            <p className="font-semibold">{name}: {msg}</p>
+            {stack && <pre className="mt-1 text-[10px] whitespace-pre-wrap opacity-80">{stack}</pre>}
+          </div>
+        ) : null}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {

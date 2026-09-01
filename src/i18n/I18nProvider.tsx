@@ -32,6 +32,20 @@ export function I18nProvider({
   );
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null;
+        if (stored && (SUPPORTED_LOCALES as readonly string[]).includes(stored) && stored !== locale) {
+          setLocaleState(stored);
+          writeCookie(stored);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (typeof document !== "undefined") {
       document.documentElement.lang = locale;
       // Backfill cookie so SSR resolves the same locale on the next visit,

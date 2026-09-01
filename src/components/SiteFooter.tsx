@@ -4,7 +4,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useNavPages } from "@/lib/nav-pages";
 
 export function SiteFooter() {
-  const { t, tField } = useI18n();
+  const { t, tField, locale } = useI18n();
   const staticPages = useNavPages();
   return (
     <footer className="mt-24 border-t border-border/60 bg-secondary/40">

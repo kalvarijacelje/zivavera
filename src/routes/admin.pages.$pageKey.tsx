@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, ArrowUp, ArrowDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -16,6 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +51,67 @@ import {
 
 export const Route = createFileRoute("/admin/pages/$pageKey")({
   component: PageEditor,
+  errorComponent: ({ error, reset }) => (
+    <div className="space-y-4 p-4 sm:p-6">
+      <Button asChild size="sm" variant="ghost">
+        <Link to="/admin/pages">
+          <ArrowLeft className="mr-1.5 size-3.5" /> All pages
+        </Link>
+      </Button>
+      <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-6 text-destructive">
+        <h2 className="font-display text-lg font-semibold">Failed to load page editor</h2>
+        <p className="mt-1 text-sm opacity-90 font-mono">
+          {error instanceof Error ? error.message : String(error)}
+        </p>
+        <div className="mt-4">
+          <Button variant="outline" size="sm" onClick={() => reset()}>
+            Try again
+          </Button>
+        </div>
+      </div>
+    </div>
+  ),
 });
+
+const BUILT_IN_PAGE_DEFAULTS: Record<
+  string,
+  {
+    internal_label: string;
+    title_en: string;
+    title_sl: string;
+    show_in_navigation: boolean;
+    nav_order: number;
+  }
+> = {
+  about: {
+    internal_label: "About Us",
+    title_sl: "Spoznajte nas",
+    title_en: "Get to know us",
+    show_in_navigation: true,
+    nav_order: 10,
+  },
+  visit: {
+    internal_label: "Visit Us",
+    title_sl: "Obiščite nas",
+    title_en: "Visit us",
+    show_in_navigation: true,
+    nav_order: 20,
+  },
+  hospitality: {
+    internal_label: "Hospitality",
+    title_sl: "Gostoljubnost",
+    title_en: "Hospitality",
+    show_in_navigation: true,
+    nav_order: 30,
+  },
+  prayer: {
+    internal_label: "Prayer Requests",
+    title_sl: "Molitev",
+    title_en: "Prayer",
+    show_in_navigation: true,
+    nav_order: 40,
+  },
+};
 
 const emptyBullet = (): Bullet => ({ text_en: "", text_sl: "" });
 const emptyItem = (): SectionItem => ({});
@@ -91,7 +157,16 @@ const emptySection = (
 });
 
 function PageEditor() {
-  const { pageKey } = Route.useParams();
+  const params = useParams({ strict: false }) as { pageKey?: string };
+  const routeParams = (() => {
+    try {
+      return Route.useParams();
+    } catch {
+      return undefined;
+    }
+  })();
+  const pageKey = routeParams?.pageKey || params?.pageKey || "about";
+
   const [page, setPage] = useState<StaticPage | null>(null);
   const [sections, setSections] = useState<StaticPageSection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,30 +183,65 @@ function PageEditor() {
   const [pageBusy, setPageBusy] = useState(false);
 
   const load = useCallback(async () => {
+    if (!pageKey) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    const { data: p, error: pErr } = await supabase
+    let { data: p, error: pErr } = await supabase
       .from("static_pages")
       .select("id, page_key, internal_label, title_en, title_sl, published, show_in_navigation, nav_order")
       .eq("page_key", pageKey)
       .maybeSingle();
+
+    // Auto-provision built-in pages if missing from static_pages table
+    if ((!p || pErr) && BUILT_IN_PAGE_DEFAULTS[pageKey]) {
+      const def = BUILT_IN_PAGE_DEFAULTS[pageKey];
+      const { data: created, error: createErr } = await supabase
+        .from("static_pages")
+        .upsert(
+          {
+            page_key: pageKey,
+            internal_label: def.internal_label,
+            title_en: def.title_en,
+            title_sl: def.title_sl,
+            published: true,
+            show_in_navigation: def.show_in_navigation ?? true,
+            nav_order: def.nav_order ?? 10,
+          },
+          { onConflict: "page_key" }
+        )
+        .select("id, page_key, internal_label, title_en, title_sl, published, show_in_navigation, nav_order")
+        .maybeSingle();
+
+      if (!createErr && created) {
+        p = created;
+        pErr = null;
+      }
+    }
+
     if (pErr || !p) {
-      toast.error(pErr?.message ?? "Page not found");
+      toast.error(pErr?.message ?? `Page "${pageKey}" not found`);
+      setPage(null);
       setLoading(false);
       return;
     }
     const pageRow = p as unknown as StaticPage;
     setPage(pageRow);
-    setPageTitleEn(pageRow.title_en);
-    setPageTitleSl(pageRow.title_sl);
-    setPageLabel(pageRow.internal_label);
-    setPagePublished(pageRow.published);
+    setPageTitleEn(pageRow.title_en ?? "");
+    setPageTitleSl(pageRow.title_sl ?? "");
+    setPageLabel(pageRow.internal_label ?? "");
+    setPagePublished(pageRow.published ?? true);
 
-    const { data: s } = await supabase
+    const { data: s, error: sErr } = await supabase
       .from("static_page_sections")
       .select("id, page_id, section_type, internal_label, sort_order, published, eyebrow_en, eyebrow_sl, title_en, title_sl, subtitle_en, subtitle_sl, body_en, body_sl, image_path, button_text_en, button_text_sl, button_link, layout_variant, bullets, items")
       .eq("page_id", pageRow.id)
       .order("sort_order")
       .limit(50);
+    if (sErr) {
+      toast.error(sErr.message);
+    }
     setSections(
       ((s ?? []) as unknown as StaticPageSection[]).map((row) => ({
         ...row,
@@ -208,10 +318,33 @@ function PageEditor() {
   };
 
   if (loading) {
-    return <div className="text-sm text-muted-foreground">Loading…</div>;
+    return (
+      <div className="flex items-center justify-center p-12 text-sm text-muted-foreground">
+        Loading page editor…
+      </div>
+    );
   }
   if (!page) {
-    return <div className="text-sm text-destructive">Page not found.</div>;
+    return (
+      <div className="space-y-4 p-4 sm:p-6">
+        <Button asChild size="sm" variant="ghost">
+          <Link to="/admin/pages">
+            <ArrowLeft className="mr-1.5 size-3.5" /> All pages
+          </Link>
+        </Button>
+        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-6 text-destructive">
+          <h2 className="font-display text-lg font-semibold">Page not found</h2>
+          <p className="mt-1 text-sm">
+            Could not find static page with key &ldquo;{pageKey}&rdquo;.
+          </p>
+          <div className="mt-4">
+            <Button variant="outline" size="sm" onClick={() => load()}>
+              Try again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -276,28 +409,30 @@ function PageEditor() {
               Sections render top to bottom in the order shown.
             </p>
           </div>
-          <Select
-            value=""
-            onValueChange={(v) => {
-              setCreatingType(v as SectionType);
-              setEditing(null);
-              setDialogOpen(true);
-            }}
-          >
-            <SelectTrigger className="w-64">
-              <SelectValue placeholder="+ Add section…" />
-            </SelectTrigger>
-            <SelectContent>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-64 justify-between">
+                <span>+ Add section…</span>
+                <Plus className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 max-h-80 overflow-y-auto">
               {SECTION_TYPES.map((t) => (
-                <SelectItem key={t.value} value={t.value}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{t.label}</span>
-                    <span className="text-xs text-muted-foreground">{t.hint}</span>
-                  </div>
-                </SelectItem>
+                <DropdownMenuItem
+                  key={t.value}
+                  onClick={() => {
+                    setCreatingType(t.value);
+                    setEditing(null);
+                    setDialogOpen(true);
+                  }}
+                  className="flex flex-col items-start cursor-pointer py-2"
+                >
+                  <span className="font-medium text-foreground">{t.label}</span>
+                  <span className="text-xs text-muted-foreground">{t.hint}</span>
+                </DropdownMenuItem>
               ))}
-            </SelectContent>
-          </Select>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="overflow-x-auto rounded-lg border border-border bg-card">

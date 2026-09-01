@@ -46,15 +46,5 @@ export const resolveInitialLocale = createIsomorphicFn()
       const fromCookie = fromCookieHeader(document.cookie);
       if (fromCookie) return fromCookie;
     }
-    if (typeof window !== "undefined") {
-      try {
-        const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-        if (stored && (SUPPORTED_LOCALES as readonly string[]).includes(stored)) {
-          return stored as Locale;
-        }
-      } catch {
-        /* ignore */
-      }
-    }
     return DEFAULT_LOCALE;
   });

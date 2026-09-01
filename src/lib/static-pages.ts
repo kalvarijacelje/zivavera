@@ -162,6 +162,15 @@ export async function fetchStaticPageByKey(pageKey: string) {
     };
   });
 
+  if (page.page_key === "visit") {
+    mappedSections.sort((a, b) => {
+      // Place Visitor Information card_grid before the contribution text block
+      if (a.section_type === "card_grid" && b.section_type !== "card_grid") return -1;
+      if (b.section_type === "card_grid" && a.section_type !== "card_grid") return 1;
+      return a.sort_order - b.sort_order;
+    });
+  }
+
   return {
     page: page as unknown as StaticPage,
     sections: mappedSections,
