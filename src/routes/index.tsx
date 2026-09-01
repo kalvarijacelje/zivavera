@@ -27,7 +27,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { SignedImage } from "@/components/admin/SignedImage";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { getSignedMediaUrl } from "@/lib/admin/storage";
+import { getSignedMediaUrl, resolveMediaUrl } from "@/lib/admin/storage";
 import { cn } from "@/lib/utils";
 import { CafeStatusBanner } from "@/components/CafeStatusBanner";
 
@@ -125,21 +125,22 @@ const DEFAULT_IMAGES: Record<string, string> = {
   community: communityImg,
   espresso: espressoImg,
 };
+const HOMEPAGE_SECTIONS_CACHE_KEY = "ziva-vera.homepage-sections.v4";
 
 const DEFAULT_HOMEPAGE_SECTIONS: Section[] = [
   {
-    id: "h-hero",
+    id: "f5968898-8caf-4977-8f33-7ca715fc51bd",
     section_type: "hero",
     sort_order: 10,
-    eyebrow_sl: "Unikatna kavarna, ki deluje po veri",
-    eyebrow_en: "A unique café that runs on faith",
-    title_sl: "Dobra kava, pristen pogovor, iskreno gostoljubje.",
-    title_en: "Good coffee, real conversation, honest hospitality.",
-    subtitle_sl: "Dobrodošli v Živi veri — prvi krščanski neprofitni kavarni v Sloveniji. Cenika ni. Ostanite, delite trenutek in prispevajte po svoji presoji.",
-    subtitle_en: "Welcome to ŽIVA VERA — Slovenia's first Christian non-profit coffee shop. There is no price list. Stay, share, and contribute what feels right.",
+    eyebrow_sl: "Prva krščanska neprofitna kavarna v Sloveniji",
+    eyebrow_en: "First Christian non-profit café in Slovenia",
+    title_sl: "Dobra kava. Pristen pogovor. Iskrena gostoljubnost.",
+    title_en: "Good coffee. Real conversation. Honest hospitality.",
+    subtitle_sl: "Kavarna, ki deluje po veri in brez cenika. Pridite na skodelico odlične kave Barcaffè, vzemite si čas in prispevajte po svojem srcu.",
+    subtitle_en: "A café that operates on faith and without a price list. Come for a cup of excellent Barcaffè coffee, take your time, and contribute from your heart.",
     body_sl: null,
     body_en: null,
-    image_path: null,
+    image_path: "events/1cd49084-200f-4854-85db-d04bccf2355a.webp",
     default_image_key: "hero",
     image_alignment: "left",
     button_text_sl: "Oglejte si ponudbo",
@@ -153,12 +154,12 @@ const DEFAULT_HOMEPAGE_SECTIONS: Section[] = [
     value_cards: null,
   },
   {
-    id: "h-values",
+    id: "c4f603ef-9406-4850-a200-727a9c9ec014",
     section_type: "values_grid",
     sort_order: 20,
     eyebrow_sl: null,
     eyebrow_en: null,
-    title_sl: "Kaj nas dela posebne",
+    title_sl: "Kaj nas dela drugačne",
     title_en: "What makes us different",
     subtitle_sl: null,
     subtitle_en: null,
@@ -178,19 +179,19 @@ const DEFAULT_HOMEPAGE_SECTIONS: Section[] = [
     value_cards: null,
   },
   {
-    id: "h-menu",
-    section_type: "featured_menu",
+    id: "fee457cb-02b1-46db-acc2-61c01cf0a526",
+    section_type: "text_with_image",
     sort_order: 30,
     eyebrow_sl: null,
     eyebrow_en: null,
-    title_sl: "Iz naše kavarne",
+    title_sl: "Z našega pulta",
     title_en: "From our counter",
     subtitle_sl: null,
     subtitle_en: null,
     body_sl: "Espresso napitki, čaji, vroča čokolada, sveži sokovi in nekaj sladkega — pripravljeno s skrbjo, postreženo z nasmehom.",
     body_en: "Espresso drinks, teas, hot chocolate, fresh juices and a few sweet things — prepared with care, served with a smile.",
-    image_path: null,
-    default_image_key: null,
+    image_path: "events/8102ba8a-33ac-465f-811e-863ff4bbb054.webp",
+    default_image_key: "espresso",
     image_alignment: "left",
     button_text_sl: "Poglejte celotno ponudbo",
     button_text_en: "Browse the full menu",
@@ -203,18 +204,18 @@ const DEFAULT_HOMEPAGE_SECTIONS: Section[] = [
     value_cards: null,
   },
   {
-    id: "h-community",
-    section_type: "text_with_image",
+    id: "638e0e45-4df9-431e-bf33-4992772d01af",
+    section_type: "call_to_action",
     sort_order: 40,
     eyebrow_sl: null,
     eyebrow_en: null,
-    title_sl: "Več kot le kavarna",
-    title_en: "More than a café",
+    title_sl: "Več kot le kavarna — prostor za skupnost",
+    title_en: "More than a café — space for community",
     subtitle_sl: null,
     subtitle_en: null,
     body_sl: "ŽIVA VERA je prostor za srečanje, pogovor in mirno preživet čas. Prostor, kjer ste dobrodošli točno takšni, kot ste.",
     body_en: "ŽIVA VERA is a place to meet, talk, and take your time. A place where you're welcome exactly as you are.",
-    image_path: null,
+    image_path: "events/31249b5b-e584-408e-b0e4-2a2486698c54.webp",
     default_image_key: "community",
     image_alignment: "right",
     button_text_sl: "Preberite našo zgodbo",
@@ -227,10 +228,46 @@ const DEFAULT_HOMEPAGE_SECTIONS: Section[] = [
     featured_event_ids: [],
     value_cards: null,
   },
+  {
+    id: "99999999-0000-0000-0000-000000000005",
+    section_type: "call_to_action",
+    sort_order: 50,
+    eyebrow_sl: "Pogovor & Podpora",
+    eyebrow_en: "Conversation & Support",
+    title_sl: "Potrebujete molitev ali miren pogovor?",
+    title_en: "Need prayer or a quiet conversation?",
+    subtitle_sl: null,
+    subtitle_en: null,
+    body_sl: "Naša ekipa je vedno pripravljena prisluhniti, moliti z vami ali vam ponuditi varen prostor za oddih.",
+    body_en: "Our team is always ready to listen, pray with you, or offer a safe place to rest.",
+    image_path: "events/a11aa3cf-b82b-4e14-9087-ed53146c315b.webp",
+    default_image_key: "hero",
+    image_alignment: "left",
+    button_text_sl: "Zaupajte nam prošnjo",
+    button_text_en: "Share a prayer request",
+    button_link: "/prayer",
+    secondary_button_text_sl: null,
+    secondary_button_text_en: null,
+    secondary_button_link: null,
+    featured_menu_item_ids: [],
+    featured_event_ids: [],
+    value_cards: null,
+  },
 ];
 
 function HomePage() {
-  const [sections, setSections] = useState<Section[]>(DEFAULT_HOMEPAGE_SECTIONS);
+  const [sections, setSections] = useState<Section[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(HOMEPAGE_SECTIONS_CACHE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return DEFAULT_HOMEPAGE_SECTIONS;
+  });
   const [menuItems, setMenuItems] = useState<Record<string, MenuItem>>({});
   const [events, setEvents] = useState<Record<string, Event>>({});
 
@@ -247,6 +284,9 @@ function HomePage() {
       if (data && data.length > 0) {
         const list = data as Section[];
         setSections(list);
+        try {
+          localStorage.setItem(HOMEPAGE_SECTIONS_CACHE_KEY, JSON.stringify(list));
+        } catch {}
       }
 
       const list = (data as Section[]) ?? [];
@@ -327,6 +367,7 @@ function usePick() {
 }
 
 function useSectionImage(section: Section) {
+  const resolved = resolveMediaUrl(section.image_path);
   const defaultImg =
     DEFAULT_IMAGES[section.default_image_key ?? ""] ??
     (section.section_type === "hero"
@@ -337,27 +378,24 @@ function useSectionImage(section: Section) {
           ? espressoImg
           : null);
 
-  const [url, setUrl] = useState<string | null>(
-    section.image_path && (section.image_path.startsWith("http") || section.image_path.startsWith("/"))
-      ? section.image_path
-      : defaultImg,
-  );
+  const [url, setUrl] = useState<string | null>(() => resolved || defaultImg);
 
   useEffect(() => {
-    let active = true;
-    if (section.image_path) {
-      if (section.image_path.startsWith("http") || section.image_path.startsWith("/")) {
-        setUrl(section.image_path);
-        return;
-      }
-      getSignedMediaUrl(section.image_path).then((u) => {
-        if (active) {
-          setUrl(u || defaultImg);
-        }
-      });
-    } else {
-      setUrl(defaultImg);
+    const direct = resolveMediaUrl(section.image_path);
+    if (direct) {
+      setUrl(direct);
+      return;
     }
+    if (!section.image_path) {
+      setUrl(defaultImg);
+      return;
+    }
+    let active = true;
+    getSignedMediaUrl(section.image_path).then((u) => {
+      if (active && u) {
+        setUrl(u);
+      }
+    });
     return () => {
       active = false;
     };
@@ -378,7 +416,6 @@ function HeroSection({ s }: { s: Section }) {
       <div className="absolute inset-0 z-0">
         {img && (
           <img
-            key={img}
             src={img}
             alt=""
             width={1920}

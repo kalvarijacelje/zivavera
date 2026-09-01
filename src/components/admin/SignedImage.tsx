@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSignedMediaUrl } from "@/lib/admin/storage";
+import { getSignedMediaUrl, resolveMediaUrl } from "@/lib/admin/storage";
 import { cn } from "@/lib/utils";
 
 export function SignedImage({
@@ -15,10 +15,16 @@ export function SignedImage({
   width?: number;
   quality?: number;
 }) {
-  const [url, setUrl] = useState<string | null>(null);
+  const [url, setUrl] = useState<string | null>(() => resolveMediaUrl(path));
   useEffect(() => {
     let active = true;
-    getSignedMediaUrl(path, { width, quality }).then((u) => active && setUrl(u));
+    const direct = resolveMediaUrl(path);
+    if (direct) {
+      setUrl(direct);
+    }
+    getSignedMediaUrl(path, { width, quality }).then((u) => {
+      if (active && u) setUrl(u);
+    });
     return () => {
       active = false;
     };

@@ -47,6 +47,19 @@ export interface MediaUrlOptions {
   resize?: 'cover' | 'contain';
 }
 
+/**
+ * Synchronously resolves a media path to a full public URL without any network delay.
+ * Eliminates image flickering during component mounts and hydration.
+ */
+export function resolveMediaUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/") || path.startsWith("data:")) {
+    return path;
+  }
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
 export async function getSignedMediaUrl(
   path: string | null | undefined,
   options?: MediaUrlOptions

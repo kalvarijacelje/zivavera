@@ -15,6 +15,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { resolveMediaUrl } from "@/lib/admin/storage";
 import heroImg from "@/assets/hero-cafe.jpg";
 
 type PageHeroConfig = {
@@ -32,7 +33,7 @@ type PageHeroConfig = {
 
 const DEFAULT_PAGE_HEROES: Record<string, PageHeroConfig> = {
   about: {
-    image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1920&q=80",
+    image: resolveMediaUrl("pages/d72766e9-9574-454b-aa27-1735a30c45b3.webp") || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1920&q=80",
     eyebrow_sl: "Zgodba in poslanstvo",
     eyebrow_en: "Our Story & Mission",
     title_sl: "Kavarna, ki jo poganjata vera in ljubezen do ljudi",
@@ -95,7 +96,7 @@ const DEFAULT_STATIC_SECTIONS: Record<string, Partial<StaticPageSection>[]> = {
       title_en: "Welcome to ŽIVA VERA",
       body_sl: "Dobrodošli v kavarni ŽIVA VERA – prostoru, kjer se dobra kava in iskreno gostoljubje prepletata z ljubeznijo do ljudi. Smo poslanstvo v prostorih Krščanske cerkve Kalvarija v Celju.\n\nNaš cilj ni ustvarjanje dobička, temveč ustvarjanje toplega zavetja, kjer se vsak obiskovalec počuti sprejetega, slišanega in spoštovanega, ne glede na svojo življenjsko pot.",
       body_en: "Welcome to ŽIVA VERA — a space where great coffee and honest hospitality intertwine with genuine care for people. We operate as an outreach mission within Calvary Chapel Celje.\n\nOur aim is never profit, but creating a welcoming haven where everyone feels valued, heard, and respected regardless of their background.",
-      image_path: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80",
+      image_path: resolveMediaUrl("pages/1572774b-d673-488e-984c-e2e0ac3a3730.webp") || "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80",
       layout_variant: "left",
     },
     {
@@ -115,7 +116,7 @@ const DEFAULT_STATIC_SECTIONS: Record<string, Partial<StaticPageSection>[]> = {
       title_en: "More than a café — a space for community",
       body_sl: "Verjamemo, da se najlepši pogovori pogosto začnejo ob skodelici kave. ŽIVA VERA je prostor za druženje, študij, branje, iskrene pogovore o veri in življenju ter kotiček miru sredi vsakodnevnega hitenja.\n\nVsak je dobrodošel, da se usede, sprosti in si vzame čas zase.",
       body_en: "We believe meaningful conversations often start over a good cup of coffee. ŽIVA VERA is a place for fellowship, reading, studying, heartfelt conversations about faith, and quiet peace in the middle of a busy day.\n\nEveryone is welcome to sit, relax, and take time for themselves.",
-      image_path: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
+      image_path: resolveMediaUrl("pages/ec7f18e0-dd02-45b1-a693-da1162f6a1a6.webp") || "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
       layout_variant: "right",
     },
     {
@@ -218,10 +219,20 @@ export function StaticPageRenderer({
   after?: ReactNode;
 }) {
   const { locale, t } = useI18n();
+  const cacheKey = `ziva-vera.page-sections.${pageKey}.v3`;
   const [page, setPage] = useState<StaticPage | null>(null);
-  const [sections, setSections] = useState<StaticPageSection[]>(
-    () => (DEFAULT_STATIC_SECTIONS[pageKey] ?? []) as StaticPageSection[],
-  );
+  const [sections, setSections] = useState<StaticPageSection[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return (DEFAULT_STATIC_SECTIONS[pageKey] ?? []) as StaticPageSection[];
+  });
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -231,13 +242,16 @@ export function StaticPageRenderer({
       setPage(res.page);
       if (res.sections.length > 0) {
         setSections(res.sections);
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(res.sections));
+        } catch {}
       }
       setLoaded(true);
     });
     return () => {
       active = false;
     };
-  }, [pageKey]);
+  }, [pageKey, cacheKey]);
 
   const defaultHero = DEFAULT_PAGE_HEROES[pageKey];
   const firstSectionIsHero = sections.length > 0 && sections[0]?.section_type === "hero";
