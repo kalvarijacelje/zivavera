@@ -8,7 +8,7 @@ INSERT INTO public.static_pages (page_key, internal_label, title_sl, title_en, s
 VALUES
   ('about', 'About Us', 'Spoznajte nas', 'Get to know us', true, 10, true),
   ('ebenezer', 'Ebenezer Grace', 'Ebenezer Grace', 'Ebenezer Grace', true, 20, true),
-  ('hospitality', 'Hospitality Policy', 'Politika gostoljubnosti', 'Hospitality Policy', true, 30, true),
+  ('hospitality', 'Hospitality', 'Naša zaveza skupnosti', 'Our Commitment to Community', true, 30, true),
   ('visit', 'Visit & Contribute', 'Obisk in prispevek', 'Visit & Contribution', true, 40, true),
   ('prayer', 'Prayer & Reflection', 'Molitev in razmišljanje', 'Prayer & Reflection', true, 50, true)
 ON CONFLICT (page_key) DO UPDATE SET
@@ -336,9 +336,9 @@ INSERT INTO public.static_page_sections (
   (
     (SELECT id FROM public.static_pages WHERE page_key = 'hospitality' LIMIT 1),
     'hero', 'Hospitality Hero', 10, true,
-    $$Naša zaveza gostom in skupnosti$$, $$Our commitment to guests and community$$,
-    $$Politika gostoljubnosti$$, $$Hospitality Policy$$,
-    $$ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Krščanske cerkve Kalvarija. Naše delovanje temelji na prostovoljnem delu, prostovoljnih prispevkih obiskovalcev ter želji ustvarjati prijeten, varen in spoštljiv prostor za vse ljudi.$$,
+    $$Naše gostoljubje$$, $$Our Hospitality$$,
+    $$Naša zaveza skupnosti$$, $$Our Commitment to Community$$,
+    $$ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.$$,
     $$ŽIVA VERA is a non-profit café that operates as a mission of Calvary Chapel Celje. Our work is built on volunteer effort, the voluntary contributions of our guests, and the desire to create a warm, safe and respectful space for everyone.$$,
     null, null,
     $$https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1920&q=80$$,

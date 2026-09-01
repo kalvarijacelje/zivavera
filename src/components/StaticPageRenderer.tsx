@@ -57,11 +57,11 @@ const DEFAULT_PAGE_HEROES: Record<string, PageHeroConfig> = {
   },
   hospitality: {
     image: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1920&q=80",
-    eyebrow_sl: "Naša zaveza gostom in skupnosti",
-    eyebrow_en: "Our commitment to guests and community",
-    title_sl: "Politika gostoljubnosti",
-    title_en: "Hospitality & Service Policy",
-    subtitle_sl: "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Krščanske cerkve Kalvarija. Naše delovanje temelji na prostovoljnem delu, prostovoljnih prispevkih obiskovalcev ter želji ustvarjati prijeten, varen in spoštljiv prostor za vse ljudi.",
+    eyebrow_sl: "Naše gostoljubje",
+    eyebrow_en: "Our Hospitality",
+    title_sl: "Naša zaveza skupnosti",
+    title_en: "Our Commitment to Community",
+    subtitle_sl: "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.",
     subtitle_en: "ŽIVA VERA is a non-profit café that operates as a mission of Calvary Chapel Celje. Our work is built on volunteer effort, the voluntary contributions of our guests, and the desire to create a warm, safe and respectful space for everyone.",
   },
   visit: {
@@ -241,7 +241,41 @@ export function StaticPageRenderer({
 
   const defaultHero = DEFAULT_PAGE_HEROES[pageKey];
   const firstSectionIsHero = sections.length > 0 && sections[0]?.section_type === "hero";
-  const heroSection = firstSectionIsHero ? sections[0] : null;
+  const rawHeroSection = firstSectionIsHero ? sections[0] : null;
+
+  // Guard against legacy database seed copy overwriting updated built-in pages (eliminates the flash)
+  const isLegacyHero =
+    rawHeroSection &&
+    ((pageKey === "hospitality" &&
+      (rawHeroSection.title_sl === "Politika gostoljubnosti" ||
+        rawHeroSection.title_sl === "Politika gostoljubnosti in postrežbe" ||
+        rawHeroSection.title_en === "Hospitality Policy" ||
+        rawHeroSection.title_en === "Hospitality and Service Policy" ||
+        rawHeroSection.eyebrow_sl === "Naša zaveza gostom in skupnosti" ||
+        rawHeroSection.eyebrow_en === "Our commitment to guests and community" ||
+        (rawHeroSection.subtitle_sl && rawHeroSection.subtitle_sl.includes("Krščanske cerkve Kalvarija")))) ||
+      (pageKey === "about" &&
+        (rawHeroSection.title_sl === "Dobra kava, pristen pogovor in iskreno gostoljubje" ||
+          rawHeroSection.title_sl === "Dobra kava, pristen pogovor, iskreno gostoljubje." ||
+          rawHeroSection.eyebrow_sl === "Prva krščanska neprofitna kavarna v Sloveniji" ||
+          rawHeroSection.eyebrow_sl === "Unikatna kavarna, ki deluje po veri")));
+
+  const heroSection = isLegacyHero ? null : rawHeroSection;
+
+  const isLegacyPage =
+    page &&
+    pageKey === "hospitality" &&
+    (page.title_sl === "Politika gostoljubnosti" ||
+      page.title_sl === "Politika gostoljubnosti in postrežbe" ||
+      page.title_en === "Hospitality Policy" ||
+      page.title_en === "Hospitality and Service Policy");
+
+  const pageTitle =
+    isLegacyPage && defaultHero
+      ? fieldByLocale(defaultHero.title_en, defaultHero.title_sl, locale)
+      : page
+        ? fieldByLocale(page.title_en, page.title_sl, locale)
+        : "";
 
   // Resolve hero properties reliably
   const heroEyebrow =
@@ -251,7 +285,7 @@ export function StaticPageRenderer({
   const heroTitle =
     (heroSection ? fieldByLocale(heroSection.title_en, heroSection.title_sl, locale) : null) ||
     (defaultHero?.title_sl ? fieldByLocale(defaultHero.title_en, defaultHero.title_sl, locale) : "") ||
-    (page ? fieldByLocale(page.title_en, page.title_sl, locale) : "");
+    pageTitle;
 
   const heroSubtitle =
     (heroSection ? fieldByLocale(heroSection.subtitle_en, heroSection.subtitle_sl, locale) : null) ||

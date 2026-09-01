@@ -99,8 +99,8 @@ const BUILT_IN_PAGE_DEFAULTS: Record<
   },
   hospitality: {
     internal_label: "Hospitality",
-    title_sl: "Gostoljubnost",
-    title_en: "Hospitality",
+    title_sl: "Naša zaveza skupnosti",
+    title_en: "Our Commitment to Community",
     show_in_navigation: true,
     nav_order: 30,
   },
@@ -227,6 +227,26 @@ function PageEditor() {
       return;
     }
     const pageRow = p as unknown as StaticPage;
+    if (pageKey === "hospitality") {
+      const isLegacyTitle =
+        pageRow.title_sl === "Politika gostoljubnosti" ||
+        pageRow.title_sl === "Politika gostoljubnosti in postrežbe" ||
+        pageRow.title_en === "Hospitality Policy" ||
+        pageRow.title_en === "Hospitality and Service Policy" ||
+        pageRow.title_sl === "Gostoljubnost" ||
+        pageRow.title_en === "Hospitality";
+
+      if (isLegacyTitle) {
+        pageRow.title_sl = "Naša zaveza skupnosti";
+        pageRow.title_en = "Our Commitment to Community";
+        supabase
+          .from("static_pages")
+          .update({ title_sl: "Naša zaveza skupnosti", title_en: "Our Commitment to Community" })
+          .eq("id", pageRow.id)
+          .then();
+      }
+    }
+
     setPage(pageRow);
     setPageTitleEn(pageRow.title_en ?? "");
     setPageTitleSl(pageRow.title_sl ?? "");
@@ -243,13 +263,48 @@ function PageEditor() {
       toast.error(sErr.message);
     }
     setSections(
-      ((s ?? []) as unknown as StaticPageSection[]).map((row) => ({
-        ...row,
-        bullets: Array.isArray(row.bullets) ? row.bullets : [],
-        items: Array.isArray((row as unknown as { items?: unknown }).items)
-          ? ((row as unknown as { items: SectionItem[] }).items)
-          : [],
-      })),
+      ((s ?? []) as unknown as StaticPageSection[]).map((row) => {
+        if (pageKey === "hospitality" && row.section_type === "hero") {
+          const isLegacy =
+            row.title_sl === "Politika gostoljubnosti" ||
+            row.title_sl === "Politika gostoljubnosti in postrežbe" ||
+            row.title_en === "Hospitality Policy" ||
+            row.title_en === "Hospitality and Service Policy" ||
+            row.eyebrow_sl === "Naša zaveza gostom in skupnosti" ||
+            row.eyebrow_en === "Our commitment to guests and community" ||
+            (row.subtitle_sl && row.subtitle_sl.includes("Krščanske cerkve Kalvarija"));
+
+          if (isLegacy) {
+            row.title_sl = "Naša zaveza skupnosti";
+            row.title_en = "Our Commitment to Community";
+            row.eyebrow_sl = "Naše gostoljubje";
+            row.eyebrow_en = "Our Hospitality";
+            row.subtitle_sl = "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.";
+            row.subtitle_en = "ŽIVA VERA is a non-profit café that operates as a mission of Calvary Chapel Celje. Our work is built on volunteer effort, the voluntary contributions of our guests, and the desire to create a warm, safe and respectful space for everyone.";
+
+            supabase
+              .from("static_page_sections")
+              .update({
+                title_sl: row.title_sl,
+                title_en: row.title_en,
+                eyebrow_sl: row.eyebrow_sl,
+                eyebrow_en: row.eyebrow_en,
+                subtitle_sl: row.subtitle_sl,
+                subtitle_en: row.subtitle_en,
+              })
+              .eq("id", row.id)
+              .then();
+          }
+        }
+
+        return {
+          ...row,
+          bullets: Array.isArray(row.bullets) ? row.bullets : [],
+          items: Array.isArray((row as unknown as { items?: unknown }).items)
+            ? ((row as unknown as { items: SectionItem[] }).items)
+            : [],
+        };
+      }),
     );
     setLoading(false);
   }, [pageKey]);

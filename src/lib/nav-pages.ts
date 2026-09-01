@@ -18,7 +18,7 @@ export function publicHrefForPage(page_key: string) {
 const DEFAULT_NAV_PAGES: NavPage[] = [
   { page_key: "about", title_en: "Get to know us", title_sl: "Spoznajte nas", nav_order: 10, is_built_in: true },
   { page_key: "ebenezer", title_en: "Ebenezer Grace", title_sl: "Ebenezer Grace", nav_order: 20, is_built_in: false },
-  { page_key: "hospitality", title_en: "Hospitality Policy", title_sl: "Politika gostoljubnosti", nav_order: 30, is_built_in: true },
+  { page_key: "hospitality", title_en: "Our Commitment to Community", title_sl: "Naša zaveza skupnosti", nav_order: 30, is_built_in: true },
 ];
 
 let cachedNavPagesPromise: Promise<NavPage[]> | null = null;

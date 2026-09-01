@@ -112,6 +112,23 @@ export async function fetchStaticPageByKey(pageKey: string) {
     supabase.from("static_pages").update({ title_en: "Get to know us" }).eq("id", page.id).then();
   }
 
+  if (page.page_key === "hospitality") {
+    const isLegacyHospitalityPage =
+      page.title_sl === "Politika gostoljubnosti" ||
+      page.title_sl === "Politika gostoljubnosti in postrežbe" ||
+      page.title_en === "Hospitality Policy" ||
+      page.title_en === "Hospitality and Service Policy";
+    if (isLegacyHospitalityPage) {
+      page.title_sl = "Naša zaveza skupnosti";
+      page.title_en = "Our Commitment to Community";
+      supabase
+        .from("static_pages")
+        .update({ title_sl: "Naša zaveza skupnosti", title_en: "Our Commitment to Community" })
+        .eq("id", page.id)
+        .then();
+    }
+  }
+
   const { data: sections } = await supabase
     .from("static_page_sections")
     .select("id, page_id, section_type, internal_label, sort_order, published, eyebrow_en, eyebrow_sl, title_en, title_sl, subtitle_en, subtitle_sl, body_en, body_sl, image_path, button_text_en, button_text_sl, button_link, layout_variant, bullets, items")
@@ -136,6 +153,41 @@ export async function fetchStaticPageByKey(pageKey: string) {
         s.eyebrow_en = "Our Story & Mission";
         s.subtitle_sl = "Spoznajte zgodbo in srce ŽIVE VERE — neprofitnega prostora v Celju, kjer se odlična kava Barcaffè prepleta z iskrenimi pogovori, toplim sprejemom in dobrodelnostjo za otroke v Etiopiji.";
         s.subtitle_en = "Discover the story behind ŽIVA VERA — a welcoming haven in Celje where exceptional Barcaffè coffee meets heartfelt conversations, open hospitality, and direct support for children in need.";
+
+        // Persist update into Supabase database
+        supabase
+          .from("static_page_sections")
+          .update({
+            title_sl: s.title_sl,
+            title_en: s.title_en,
+            eyebrow_sl: s.eyebrow_sl,
+            eyebrow_en: s.eyebrow_en,
+            subtitle_sl: s.subtitle_sl,
+            subtitle_en: s.subtitle_en,
+          })
+          .eq("id", s.id)
+          .then();
+      }
+    }
+
+    // If the hospitality page has a legacy hero section, normalize to the new copy
+    if (s.section_type === "hero" && page.page_key === "hospitality") {
+      const isLegacyHospitalityHero =
+        s.title_sl === "Politika gostoljubnosti" ||
+        s.title_sl === "Politika gostoljubnosti in postrežbe" ||
+        s.title_en === "Hospitality Policy" ||
+        s.title_en === "Hospitality and Service Policy" ||
+        s.eyebrow_sl === "Naša zaveza gostom in skupnosti" ||
+        s.eyebrow_en === "Our commitment to guests and community" ||
+        (s.subtitle_sl && s.subtitle_sl.includes("Krščanske cerkve Kalvarija"));
+
+      if (isLegacyHospitalityHero) {
+        s.title_sl = "Naša zaveza skupnosti";
+        s.title_en = "Our Commitment to Community";
+        s.eyebrow_sl = "Naše gostoljubje";
+        s.eyebrow_en = "Our Hospitality";
+        s.subtitle_sl = "ŽIVA VERA je neprofitna kavarna, ki deluje kot poslanstvo Calvary Chapel Celje. Naše delo temelji na prostovoljstvu, prostovoljnih prispevkih naših obiskovalcev ter želji po ustvarjanju toplega, varnega in spoštljivega prostora za vsakogar.";
+        s.subtitle_en = "ŽIVA VERA is a non-profit café that operates as a mission of Calvary Chapel Celje. Our work is built on volunteer effort, the voluntary contributions of our guests, and the desire to create a warm, safe and respectful space for everyone.";
 
         // Persist update into Supabase database
         supabase
