@@ -35,13 +35,9 @@ function fromCookieHeader(header: string | undefined | null): Locale | null {
  */
 export const resolveInitialLocale = createIsomorphicFn()
   .server((): Locale => {
-    try {
-      const cookie = getCookie(LOCALE_COOKIE);
-      if (cookie && (SUPPORTED_LOCALES as readonly string[]).includes(cookie)) {
-        return cookie as Locale;
-      }
-    } catch (err) {
-      console.warn("[locale] Could not read cookie during SSR:", err);
+    const cookie = getCookie(LOCALE_COOKIE);
+    if (cookie && (SUPPORTED_LOCALES as readonly string[]).includes(cookie)) {
+      return cookie as Locale;
     }
     return DEFAULT_LOCALE;
   })
