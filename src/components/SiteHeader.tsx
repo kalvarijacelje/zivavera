@@ -88,11 +88,11 @@ export function SiteHeader() {
           onClick={() => setOpen(false)}
         >
           <img
-            src={logoLight}
+            src="/logo.png"
             alt={t("brand.name")}
             width={40}
             height={40}
-            className="size-10 rounded-full object-cover ring-1 ring-border shadow-xs"
+            className="size-10 object-contain drop-shadow-xs"
           />
           <div className="leading-tight">
             <div className="font-display text-lg font-semibold tracking-tight text-foreground">

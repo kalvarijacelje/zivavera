@@ -12,11 +12,11 @@ export function SiteFooter() {
         <div>
           <div className="flex items-center gap-3">
             <img
-              src={logoLight}
+              src="/logo.png"
               alt={t("brand.name")}
               width={48}
               height={48}
-              className="size-12 rounded-full object-cover ring-1 ring-border"
+              className="size-12 object-contain drop-shadow-xs"
               loading="lazy"
             />
             <div>

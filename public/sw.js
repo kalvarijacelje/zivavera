@@ -1,8 +1,12 @@
-const CACHE_NAME = 'ziva-vera-v1';
+const CACHE_NAME = 'ziva-vera-v3';
 const STATIC_ASSETS = [
   '/',
   '/manifest.webmanifest',
-  '/logo-icon.svg',
+  '/logo.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-maskable.png',
+  '/zivavera-logo-bel.png',
   '/favicon.ico',
   '/KCK-logo-rdec_small.png'
 ];

@@ -2,6 +2,14 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import path from "path";
 import fs from "fs";
 
+// Automatically process master zivavera-logo-bel.png to generate transparent and mobile icons
+try {
+  const { processAllLogos } = await import("./scripts/process-logo.mjs");
+  processAllLogos();
+} catch (e) {
+  // fallback if executed in environment without top-level await
+}
+
 // Sync master logo files in public folder
 try {
   const masterLogo = path.resolve(__dirname, "../kck/public/KCK-logo-rdec_small.png");

@@ -6,19 +6,37 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#2c1810",
-  "theme_color": "#8b5e34",
+  "background_color": "#24140e",
+  "theme_color": "#ea7010",
   "lang": "sl",
   "icons": [
     {
-      "src": "/logo-icon.svg",
-      "sizes": "192x192 512x512 any",
-      "type": "image/svg+xml",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/KCK-logo-rdec_small.png",
-      "sizes": "192x192 512x512",
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512 any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/zivavera-logo-bel.png",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any"
     }
