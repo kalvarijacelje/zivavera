@@ -13,6 +13,7 @@ import {
   DoorOpen,
   Users,
   Globe,
+  ChevronDown,
 } from "lucide-react";
 import { useSession, useIsAdmin } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +22,14 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { useI18n } from "@/i18n/I18nProvider";
 import { SUPPORTED_LOCALES, type Locale } from "@/i18n/translations";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -53,6 +62,15 @@ function AdminLayout() {
   const { session, fullName, loading } = useSession();
   const isAdmin = useIsAdmin(session?.user.id);
   const { locale, setLocale, t } = useI18n();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
+
+  const userInitial = fullName
+    ? fullName.trim().charAt(0).toUpperCase()
+    : session?.user.email?.trim().charAt(0).toUpperCase() || "A";
 
   const links = [
     { to: "/admin", label: t("admin.nav.dashboard"), icon: LayoutDashboard, exact: true },
@@ -93,10 +111,7 @@ function AdminLayout() {
         <Button
           variant="outline"
           size="sm"
-          onClick={async () => {
-            await supabase.auth.signOut();
-            navigate({ to: "/login" });
-          }}
+          onClick={handleSignOut}
         >
           Sign out
         </Button>
@@ -161,7 +176,7 @@ function AdminLayout() {
           <div className="border-t border-border p-3">
             <Link
               to="/"
-              className="mb-2 inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+              className="mb-2 inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
             >
               <ExternalLink className="size-4" />
               {t("admin.nav.viewSite")}
@@ -173,11 +188,8 @@ function AdminLayout() {
             <Button
               variant="ghost"
               size="sm"
-              className="w-full justify-start"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate({ to: "/login" });
-              }}
+              className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={handleSignOut}
             >
               <LogOut className="mr-2 size-4" /> {t("admin.nav.signOut")}
             </Button>
@@ -187,28 +199,29 @@ function AdminLayout() {
         {/* Main Content Area */}
         <main className="min-w-0 flex-1 flex flex-col">
           {/* Top Bar for Desktop & Mobile */}
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/90 px-4 sm:px-6 backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <span className="font-display font-semibold text-foreground text-sm">
-                ŽIVA VERA <span className="text-muted-foreground text-xs uppercase tracking-wider">· {t("nav.admin")}</span>
-              </span>
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/90 px-3 sm:px-6 backdrop-blur-md">
+            <div className="flex items-center gap-2 min-w-0">
+              <Link to="/admin" className="flex items-center gap-1.5 font-display text-sm font-semibold text-foreground truncate hover:opacity-80 transition-opacity">
+                <span>ŽIVA VERA</span>
+                <span className="text-muted-foreground text-xs uppercase tracking-wider font-normal">· {t("nav.admin")}</span>
+              </Link>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {/* Top Language Switcher */}
               <div
-                className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-secondary/60 p-0.5 text-xs font-medium"
+                className="inline-flex items-center gap-0.5 sm:gap-1 rounded-full border border-border/80 bg-secondary/60 p-0.5 text-xs font-medium"
                 role="group"
                 aria-label={t("lang.switch")}
               >
-                <Globe className="ml-1.5 size-3.5 text-muted-foreground" aria-hidden />
+                <Globe className="ml-1 sm:ml-1.5 size-3 sm:size-3.5 text-muted-foreground hidden xs:inline" aria-hidden />
                 {SUPPORTED_LOCALES.map((l: Locale) => (
                   <button
                     key={l}
                     type="button"
                     onClick={() => setLocale(l)}
                     className={cn(
-                      "rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider transition-all",
+                      "rounded-full px-1.5 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-all",
                       locale === l
                         ? "bg-background text-foreground shadow-xs"
                         : "text-muted-foreground hover:text-foreground",
@@ -220,30 +233,96 @@ function AdminLayout() {
                 ))}
               </div>
 
+              {/* View Site link - visible on all screens */}
               <Link
                 to="/"
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-secondary/40 px-2 sm:px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                title={t("admin.nav.viewSite")}
               >
-                <ExternalLink className="size-3.5" />
-                <span>{t("admin.nav.viewSite")}</span>
+                <ExternalLink className="size-3.5 shrink-0" />
+                <span className="hidden sm:inline">{t("admin.nav.viewSite")}</span>
               </Link>
+
+              {/* User Menu Dropdown (shows signed-in account details & sign out) */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-secondary/40 px-1.5 sm:px-2 py-1 text-xs font-medium text-foreground hover:bg-secondary transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
+                    aria-label="User account menu"
+                  >
+                    <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
+                      {userInitial}
+                    </div>
+                    <span className="hidden lg:inline max-w-[120px] truncate text-xs">
+                      {fullName || session.user.email}
+                    </span>
+                    <ChevronDown className="size-3 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 p-1.5">
+                  <DropdownMenuLabel className="font-normal px-2 py-1.5">
+                    <p className="text-[11px] font-medium text-muted-foreground">{t("admin.nav.signedInAs")}</p>
+                    {fullName && (
+                      <p className="text-xs font-semibold text-foreground truncate mt-0.5">{fullName}</p>
+                    )}
+                    <p className="text-[11px] text-muted-foreground truncate">{session.user.email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/" className="flex w-full items-center gap-2 cursor-pointer text-xs">
+                      <ExternalLink className="size-3.5" />
+                      <span>{t("admin.nav.viewSite")}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="flex items-center gap-2 text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer text-xs"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="size-3.5" />
+                    <span>{t("admin.nav.signOut")}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
-          {/* Mobile Navigation Row */}
-          <div className="border-b border-border bg-card px-4 py-2.5 md:hidden overflow-x-auto">
-            <nav className="flex gap-1 min-w-max">
+          {/* Mobile Navigation Row (Horizontal Scroll) */}
+          <div className="border-b border-border bg-card px-3 py-2 md:hidden overflow-x-auto">
+            <nav className="flex items-center gap-1 min-w-max">
               {links.map((l) => (
                 <Link
                   key={l.to}
                   to={l.to as "/admin"}
                   activeOptions={{ exact: l.exact }}
                   activeProps={{ className: "bg-secondary text-foreground font-semibold" }}
-                  className="rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-secondary"
+                  className="rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors shrink-0"
                 >
                   {l.label}
                 </Link>
               ))}
+
+              <div className="h-4 w-px bg-border shrink-0 mx-1" aria-hidden />
+
+              {/* Quick View Site in scroll menu */}
+              <Link
+                to="/"
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground shrink-0 transition-colors"
+              >
+                <ExternalLink className="size-3" />
+                <span>{t("admin.nav.viewSite")}</span>
+              </Link>
+
+              {/* Quick Sign Out in scroll menu */}
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-destructive hover:bg-destructive/10 shrink-0 transition-colors"
+              >
+                <LogOut className="size-3" />
+                <span>{t("admin.nav.signOut")}</span>
+              </button>
             </nav>
           </div>
 

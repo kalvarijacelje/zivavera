@@ -106,12 +106,7 @@ const en: TranslationDict = {
   "visit.intro":
     "We'd love to meet you. Stop in for a coffee, stay for a conversation, and contribute what feels right — there's no price list.",
   "visit.hours.title": "Opening hours",
-  "visit.hours.weekdays": "Tuesday and Friday",
-  "visit.hours.weekdaysTime": "(currently open only 2 days a week) 8.30-13.30",
-  "visit.hours.saturday": "Monday, Wednesday, Thursday, Saturday",
-  "visit.hours.saturdayTime": "Closed",
-  "visit.hours.sunday": "Sunday",
-  "visit.hours.sundayTime": "(open during worship) 9:00 - 13:00",
+  "visit.hours.duringService": "(during service)",
   "visit.location.title": "Find us",
   "visit.location.address": "Bežigrajska cesta 7, Celje",
   "visit.location.body":
@@ -147,6 +142,7 @@ const en: TranslationDict = {
   "admin.nav.events": "Events",
   "admin.nav.viewSite": "View site",
   "admin.nav.signOut": "Sign out",
+  "admin.nav.signedInAs": "Signed in as",
 
   // Admin Dashboard
   "admin.dash.title": "Dashboard",
@@ -367,12 +363,7 @@ const sl: TranslationDict = {
   "visit.intro":
     "Veseli bomo vašega obiska. Pridite na kavo, ostanite na pogovoru in prispevajte po svoji presoji — cenika ni.",
   "visit.hours.title": "Odpiralni čas",
-  "visit.hours.weekdays": "Torek in Petek",
-  "visit.hours.weekdaysTime": "(trenutno smo odprti samo 2 dni v tednu) 8.30-13.30",
-  "visit.hours.saturday": "Ponedeljek, Sreda, Četrtek, Sobota",
-  "visit.hours.saturdayTime": "Zaprto",
-  "visit.hours.sunday": "Nedelja",
-  "visit.hours.sundayTime": "(odprti v času bogoslužja) 9:00 - 13.00",
+  "visit.hours.duringService": "(med bogoslužjem)",
   "visit.location.title": "Najdete nas",
   "visit.location.address": "Bežigrajska cesta 7, Celje",
   "visit.location.body":
@@ -408,6 +399,7 @@ const sl: TranslationDict = {
   "admin.nav.events": "Dogodki",
   "admin.nav.viewSite": "Ogled strani",
   "admin.nav.signOut": "Odjava",
+  "admin.nav.signedInAs": "Prijavljeni kot",
 
   // Admin Dashboard
   "admin.dash.title": "Nadzorna plošča",

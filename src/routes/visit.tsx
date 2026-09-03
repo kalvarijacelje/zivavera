@@ -186,8 +186,9 @@ function OperationalCards() {
           <div className="mt-4 divide-y divide-border/60 text-sm">
             {DAYS_ORDER.map((d) => {
               const isToday = d.key === currentDayKey;
-              const daySched = schedule[d.key];
-              const isEnabled = daySched?.enabled;
+              const daySched = schedule?.[d.key] || DEFAULT_SCHEDULE[d.key] || { enabled: false, open: "08:00", close: "14:00" };
+              const isEnabled = !!daySched?.enabled;
+              const noteText = locale === "sl" ? d.noteSl : d.noteEn;
 
               return (
                 <div
@@ -197,10 +198,15 @@ function OperationalCards() {
                     isToday && "font-semibold text-primary bg-primary/[0.04] -mx-2 px-2 rounded-lg"
                   )}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className={cn(!isEnabled && "text-muted-foreground")}>
                       {locale === "sl" ? d.nameSl : d.nameEn}
                     </span>
+                    {noteText && (
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {noteText}
+                      </span>
+                    )}
                     {isToday && (
                       <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
                         {locale === "sl" ? "Danes" : "Today"}
@@ -208,8 +214,8 @@ function OperationalCards() {
                     )}
                   </div>
 
-                  <span className={cn("font-medium", !isEnabled && "text-muted-foreground text-xs italic font-normal")}>
-                    {isEnabled ? `${daySched.open} – ${daySched.close}` : (locale === "sl" ? "Zaprto" : "Closed")}
+                  <span className={cn("font-medium shrink-0 ml-2", !isEnabled && "text-muted-foreground text-xs italic font-normal")}>
+                    {isEnabled ? `${daySched.open || "08:00"} – ${daySched.close || "14:00"}` : (locale === "sl" ? "Zaprto" : "Closed")}
                   </span>
                 </div>
               );

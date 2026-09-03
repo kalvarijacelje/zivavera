@@ -440,8 +440,13 @@ function CafeStatusAdmin() {
                     checked={item.enabled}
                     onCheckedChange={(checked) => handleDayChange(day.key, { enabled: checked })}
                   />
-                  <Label htmlFor={`switch-${day.key}`} className="font-medium cursor-pointer">
-                    {locale === "sl" ? day.nameSl : day.nameEn}
+                  <Label htmlFor={`switch-${day.key}`} className="font-medium cursor-pointer flex items-center gap-1.5 flex-wrap">
+                    <span>{locale === "sl" ? day.nameSl : day.nameEn}</span>
+                    {(locale === "sl" ? day.noteSl : day.noteEn) && (
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {locale === "sl" ? day.noteSl : day.noteEn}
+                      </span>
+                    )}
                   </Label>
                 </div>
 

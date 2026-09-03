@@ -73,7 +73,7 @@ function CustomersAdminPage() {
 
   // Filters for Visits
   const [visitSearch, setVisitSearch] = useState("");
-  const [dateFilter, setDateFilter] = useState<"all" | "today" | "week" | "month">("all");
+  const [dateFilter, setDateFilter] = useState<"today" | "week" | "month" | "all">("today");
   const [donationFilter, setDonationFilter] = useState<"all" | "donations" | "cash" | "card">("all");
 
   // Filters for Customers
@@ -332,7 +332,7 @@ function CustomersAdminPage() {
             <div className="flex flex-wrap items-center gap-2">
               {/* Date Filter */}
               <div className="flex rounded-lg border border-border bg-background p-0.5 text-xs font-medium">
-                {(["all", "today", "week", "month"] as const).map((d) => (
+                {(["today", "week", "month", "all"] as const).map((d) => (
                   <button
                     key={d}
                     type="button"
@@ -342,7 +342,13 @@ function CustomersAdminPage() {
                       dateFilter === d ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    {d === "all" ? t("admin.cust.filterAll") : d === "today" ? t("admin.cust.filterToday") : d === "week" ? t("admin.cust.filterWeek") : t("admin.cust.filterMonth")}
+                    {d === "today"
+                      ? t("admin.cust.filterToday")
+                      : d === "week"
+                      ? t("admin.cust.filterWeek")
+                      : d === "month"
+                      ? t("admin.cust.filterMonth")
+                      : t("admin.cust.filterAll")}
                   </button>
                 ))}
               </div>

@@ -27,7 +27,7 @@ export const DEFAULT_SCHEDULE: WeeklySchedule = {
   thu: { enabled: true, open: "08:00", close: "14:00" },
   fri: { enabled: true, open: "08:00", close: "14:00" },
   sat: { enabled: false, open: "09:00", close: "13:00" },
-  sun: { enabled: false, open: "09:00", close: "13:00" },
+  sun: { enabled: true, open: "09:00", close: "13:00" },
 };
 
 export const DAYS_ORDER: {
@@ -36,6 +36,8 @@ export const DAYS_ORDER: {
   nameEn: string;
   shortSl: string;
   shortEn: string;
+  noteSl?: string;
+  noteEn?: string;
 }[] = [
   { key: "mon", nameSl: "Ponedeljek", nameEn: "Monday", shortSl: "Pon", shortEn: "Mon" },
   { key: "tue", nameSl: "Torek", nameEn: "Tuesday", shortSl: "Tor", shortEn: "Tue" },
@@ -43,7 +45,15 @@ export const DAYS_ORDER: {
   { key: "thu", nameSl: "Četrtek", nameEn: "Thursday", shortSl: "Čet", shortEn: "Thu" },
   { key: "fri", nameSl: "Petek", nameEn: "Friday", shortSl: "Pet", shortEn: "Fri" },
   { key: "sat", nameSl: "Sobota", nameEn: "Saturday", shortSl: "Sob", shortEn: "Sat" },
-  { key: "sun", nameSl: "Nedelja", nameEn: "Sunday", shortSl: "Ned", shortEn: "Sun" },
+  {
+    key: "sun",
+    nameSl: "Nedelja",
+    nameEn: "Sunday",
+    shortSl: "Ned",
+    shortEn: "Sun",
+    noteSl: "(med bogoslužjem)",
+    noteEn: "(during service)",
+  },
 ];
 
 export function timeToMinutes(t: string): number {
@@ -172,6 +182,15 @@ export function evaluateCafeStatus(
   const currentIdx = dayKeys.indexOf(currentDayKey);
   let nextOpenTextSl = "Zaprto";
   let nextOpenTextEn = "Closed";
+  const slAccusative: Record<DayKey, string> = {
+    mon: "ponedeljek",
+    tue: "torek",
+    wed: "sredo",
+    thu: "četrtek",
+    fri: "petek",
+    sat: "soboto",
+    sun: "nedeljo",
+  };
 
   for (let i = 1; i <= 7; i++) {
     const nextIdx = (currentIdx + i) % 7;
@@ -183,7 +202,7 @@ export function evaluateCafeStatus(
         nextOpenTextSl = `Odpre se jutri ob ${nextDaySched.open}`;
         nextOpenTextEn = `Opens tomorrow at ${nextDaySched.open}`;
       } else {
-        nextOpenTextSl = `Odpre se v ${dayMeta?.nameSl.toLowerCase() || nextKey} ob ${nextDaySched.open}`;
+        nextOpenTextSl = `Odpre se v ${slAccusative[nextKey] || nextKey} ob ${nextDaySched.open}`;
         nextOpenTextEn = `Opens ${dayMeta?.nameEn || nextKey} at ${nextDaySched.open}`;
       }
       break;
