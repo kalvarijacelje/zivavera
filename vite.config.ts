@@ -2,15 +2,23 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import path from "path";
 import fs from "fs";
 
-// Automatically process master zivavera-logo-bel.png to generate transparent and mobile icons
+// 1. Automatically process master zivavera-logo-bel.png to generate transparent and mobile icons
 try {
   const { processAllLogos } = await import("./scripts/process-logo.mjs");
   processAllLogos();
 } catch (e) {
-  // fallback if executed in environment without top-level await
+  // fallback
 }
 
-// Sync master logo files in public folder
+// 2. Automatically sync optimized assets to Cloudflare R2 bucket (kck-media)
+try {
+  const { syncAllToR2 } = await import("./scripts/r2-uploader.mjs");
+  syncAllToR2().catch((err) => console.warn("[R2 Sync warning]:", err));
+} catch (e) {
+  // fallback
+}
+
+// 3. Sync master logo files in public folder
 try {
   const masterLogo = path.resolve(__dirname, "../kck/public/KCK-logo-rdec_small.png");
   const masterSecondary = path.resolve(__dirname, "../kck/public/KCK-logo-rdec-sekundaren_small.png");

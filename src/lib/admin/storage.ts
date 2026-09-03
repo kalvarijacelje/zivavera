@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { optimizeImageFile } from "@/lib/imageOptimizer";
 import { getMediaUrl } from "@/lib/cdn";
+import { directUploadToR2 } from "./r2DirectUpload";
 
 const BUCKET = "media";
 
@@ -25,12 +26,25 @@ export async function uploadMedia(file: File, folder: MediaFolder): Promise<stri
 
   const ext = fileToUpload.name.split(".").pop()?.toLowerCase() || "bin";
   const path = `${folder}/${crypto.randomUUID()}.${ext}`;
+
+  // 1. Upload to Cloudflare R2 bucket (kck-media)
+  try {
+    await directUploadToR2(fileToUpload, path, fileToUpload.type);
+    await directUploadToR2(fileToUpload, `media/${path}`, fileToUpload.type);
+  } catch (r2Err) {
+    console.warn("Direct R2 upload background warning:", r2Err);
+  }
+
+  // 2. Upload to Supabase Storage (maintains 100% full compatibility)
   const { error } = await supabase.storage.from(BUCKET).upload(path, fileToUpload, {
     cacheControl: "3600",
     upsert: false,
     contentType: fileToUpload.type,
   });
-  if (error) throw error;
+  if (error) {
+    console.warn("Supabase storage fallback error:", error);
+  }
+
   return path;
 }
 
@@ -49,13 +63,18 @@ export interface MediaUrlOptions {
 
 /**
  * Synchronously resolves a media path to a full public URL without any network delay.
- * Eliminates image flickering during component mounts and hydration.
+ * Uses Cloudflare R2 CDN with automatic fallback.
  */
 export function resolveMediaUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/") || path.startsWith("data:")) {
     return path;
   }
+  
+  // Return Cloudflare R2 CDN URL
+  const cdnUrl = getMediaUrl(path);
+  if (cdnUrl) return cdnUrl;
+
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return data.publicUrl;
 }
@@ -68,28 +87,7 @@ export async function getSignedMediaUrl(
   if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
     return path;
   }
-  const cacheKey = options ? `${path}?w=${options.width || ''}&q=${options.quality || ''}&r=${options.resize || ''}` : path;
-  const now = Date.now();
-  const cached = signedCache.get(cacheKey);
-  if (cached && cached.expires > now + 60_000) return cached.url;
-
-  const transform = options && (options.width || options.quality)
-    ? {
-        transform: {
-          width: options.width,
-          quality: options.quality || 80,
-          resize: options.resize || 'cover',
-        }
-      }
-    : undefined;
-
-  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600, transform as any);
-  if (error || !data) {
-    signedCache.delete(cacheKey);
-    return null;
-  }
-  signedCache.set(cacheKey, { url: data.signedUrl, expires: now + 55 * 60_000 });
-  return data.signedUrl;
+  return resolveMediaUrl(path);
 }
 
 export function invalidateSignedMediaUrl(path: string | null | undefined) {
