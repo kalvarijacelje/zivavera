@@ -9,7 +9,7 @@ export type NavPage = {
   is_built_in: boolean;
 };
 
-export const BUILT_IN_PAGE_KEYS = new Set(["about", "visit", "hospitality", "prayer"]);
+export const BUILT_IN_PAGE_KEYS = new Set(["about", "visit", "hospitality", "prayer", "events"]);
 
 export function publicHrefForPage(page_key: string) {
   return BUILT_IN_PAGE_KEYS.has(page_key) ? `/${page_key}` : `/p/${page_key}`;

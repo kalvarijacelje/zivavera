@@ -83,6 +83,15 @@ const DEFAULT_PAGE_HEROES: Record<string, PageHeroConfig> = {
     subtitle_sl: "Vsak dan si lahko vzamete trenutek za oddih, preberete spodbudno misel ali zaupate svojo molitveno prošnjo naši pastoralni ekipi.",
     subtitle_en: "Take a quiet moment of rest, read an encouraging thought, or share your prayer request with our pastoral team.",
   },
+  events: {
+    image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1920&q=80",
+    eyebrow_sl: "Srečevanja, glasba in pogovori",
+    eyebrow_en: "Community, music & conversation",
+    title_sl: "Dogodki v Živi veri",
+    title_en: "Events at ŽIVA VERA",
+    subtitle_sl: "Srečanja, pogovori in male slovesnosti. Vstopite — vedno ste dobrodošli.",
+    subtitle_en: "Gatherings, conversations and small celebrations. Stop by — you're always welcome.",
+  },
 };
 
 const DEFAULT_STATIC_SECTIONS: Record<string, Partial<StaticPageSection>[]> = {
@@ -206,6 +215,21 @@ const DEFAULT_STATIC_SECTIONS: Record<string, Partial<StaticPageSection>[]> = {
       body_en: "Thank you for your understanding, your support and your respect for the values on which ŽIVA VERA is built.",
     },
   ],
+  events: [
+    {
+      id: "ev-bottom-cta",
+      section_type: "call_to_action",
+      title_sl: "Imate idejo za dogodek ali vprašanje?",
+      title_en: "Have an event idea or a question?",
+      subtitle_sl: "Z veseljem vas poslušamo in podpremo smiselna srečanja v našem prostoru.",
+      subtitle_en: "We would love to hear from you and support meaningful gatherings in our space.",
+      body_sl: "Pridite v kavarno ali stopite v stik z nami. ŽIVA VERA je odprt prostor za skupnost.",
+      body_en: "Stop by the café or reach out to us. ŽIVA VERA is an open space for the community.",
+      button_text_sl: "Obiščite nas →",
+      button_text_en: "Visit us →",
+      button_link: "/visit",
+    },
+  ],
 };
 
 export function StaticPageRenderer({
@@ -309,10 +333,11 @@ export function StaticPageRenderer({
     (heroSection ? fieldByLocale(heroSection.subtitle_en, heroSection.subtitle_sl, locale) : null) ||
     (defaultHero ? fieldByLocale(defaultHero.subtitle_en, defaultHero.subtitle_sl, locale) : "");
 
-  const heroImage =
-    (heroSection?.image_path && heroSection.image_path.startsWith("http"))
-      ? heroSection.image_path
-      : defaultHero?.image;
+  const heroImage = heroSection?.image_path
+    ? (heroSection.image_path.startsWith("http")
+        ? heroSection.image_path
+        : resolveMediaUrl(heroSection.image_path) || heroSection.image_path)
+    : defaultHero?.image;
 
   const heroBtnText =
     (heroSection ? fieldByLocale(heroSection.button_text_en, heroSection.button_text_sl, locale) : null) ||

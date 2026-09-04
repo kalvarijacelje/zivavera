@@ -18,7 +18,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const staticPages = useNavPages();
   const dropdownPages = staticPages.filter(
-    (p) => p.page_key !== "prayer" && p.page_key !== "visit",
+    (p) => p.page_key !== "prayer" && p.page_key !== "visit" && p.page_key !== "events",
   );
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isPwaInstalled, setIsPwaInstalled] = useState(false);

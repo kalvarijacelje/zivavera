@@ -111,6 +111,13 @@ const BUILT_IN_PAGE_DEFAULTS: Record<
     show_in_navigation: true,
     nav_order: 40,
   },
+  events: {
+    internal_label: "Events",
+    title_sl: "Dogodki",
+    title_en: "Events",
+    show_in_navigation: false,
+    nav_order: 15,
+  },
 };
 
 const emptyBullet = (): Bullet => ({ text_en: "", text_sl: "" });
@@ -264,8 +271,58 @@ function PageEditor() {
     if (sErr) {
       toast.error(sErr.message);
     }
+
+    let sectionData = s ?? [];
+    if (pageKey === "events" && sectionData.length === 0) {
+      const defaultEventsSections = [
+        {
+          page_id: pageRow.id,
+          section_type: "hero" as SectionType,
+          internal_label: "Hero Card (Top Banner)",
+          sort_order: 1,
+          published: true,
+          eyebrow_sl: "Srečevanja, glasba in pogovori",
+          eyebrow_en: "Community, music & conversation",
+          title_sl: "Dogodki v Živi veri",
+          title_en: "Events at ŽIVA VERA",
+          subtitle_sl: "Srečanja, pogovori in male slovesnosti. Vstopite — vedno ste dobrodošli.",
+          subtitle_en: "Gatherings, conversations and small celebrations. Stop by — you're always welcome.",
+          image_path: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1920&q=80",
+          bullets: [],
+          items: [],
+          layout_variant: "center",
+        },
+        {
+          page_id: pageRow.id,
+          section_type: "call_to_action" as SectionType,
+          internal_label: "Bottom Banner (Call to action)",
+          sort_order: 2,
+          published: true,
+          title_sl: "Imate idejo za dogodek ali vprašanje?",
+          title_en: "Have an event idea or a question?",
+          subtitle_sl: "Z veseljem vas poslušamo in podpremo smiselna srečanja v našem prostoru.",
+          subtitle_en: "We would love to hear from you and support meaningful gatherings in our space.",
+          body_sl: "Pridite v kavarno ali stopite v stik z nami. ŽIVA VERA je odprt prostor za skupnost.",
+          body_en: "Stop by the café or reach out to us. ŽIVA VERA is an open space for the community.",
+          button_text_sl: "Obiščite nas →",
+          button_text_en: "Visit us →",
+          button_link: "/visit",
+          bullets: [],
+          items: [],
+          layout_variant: "center",
+        },
+      ];
+      const { data: inserted } = await supabase
+        .from("static_page_sections")
+        .insert(defaultEventsSections)
+        .select("id, page_id, section_type, internal_label, sort_order, published, eyebrow_en, eyebrow_sl, title_en, title_sl, subtitle_en, subtitle_sl, body_en, body_sl, image_path, button_text_en, button_text_sl, button_link, layout_variant, bullets, items");
+      if (inserted && inserted.length > 0) {
+        sectionData = inserted;
+      }
+    }
+
     setSections(
-      ((s ?? []) as unknown as StaticPageSection[]).map((row) => {
+      ((sectionData ?? []) as unknown as StaticPageSection[]).map((row) => {
         if (pageKey === "hospitality" && row.section_type === "hero") {
           const isLegacy =
             row.title_sl === "Politika gostoljubnosti" ||

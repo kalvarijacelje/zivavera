@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { getEffectiveEventDate, formatRecurrenceLabel, type RecurrenceInterval } from "@/lib/events";
 import { FormattedEventDescription } from "@/components/FormattedEventDescription";
+import { StaticPageRenderer } from "@/components/StaticPageRenderer";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -170,40 +171,16 @@ function EventsPage() {
 
   return (
     <SiteShell>
-      {/* Full-width Ambient Hero Banner matching homepage */}
-      <section className="relative isolate overflow-hidden min-h-[460px] sm:min-h-[520px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1920&q=80"
-            alt=""
-            width={1920}
-            height={1280}
-            className="size-full object-cover scale-105 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/65 to-background" />
-        </div>
-        <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6 md:py-24 w-full">
-          <p className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/80 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary backdrop-blur-sm shadow-xs">
-            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-            {locale === "sl" ? "Srečevanja, glasba in pogovori" : "Community, music & conversation"}
-          </p>
-          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.08] text-balance text-foreground sm:text-5xl md:text-6xl tracking-tight">
-            {t("events.title")}
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-pretty font-normal text-muted-foreground sm:text-lg">
-            {t("events.intro")}
-          </p>
-        </div>
-      </section>
-
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-16">
-        {events === null ? (
-          <p className="py-12 text-center text-sm text-muted-foreground">…</p>
-        ) : grouped.length === 0 ? (
-          <p className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center text-muted-foreground">
-            {t("events.empty")}
-          </p>
-        ) : (
+      <StaticPageRenderer
+        pageKey="events"
+        before={
+          events === null ? (
+            <p className="py-12 text-center text-sm text-muted-foreground">…</p>
+          ) : grouped.length === 0 ? (
+            <p className="rounded-3xl border border-dashed border-border bg-card/60 p-12 text-center text-muted-foreground">
+              {t("events.empty")}
+            </p>
+          ) : (
           <div className="space-y-16">
             {grouped.map(({ cat, events: list }, gi) => {
               const catDescription = cat ? pick(cat.description_en, cat.description_sl) : null;
@@ -302,8 +279,9 @@ function EventsPage() {
               );
             })}
           </div>
-        )}
-      </div>
-    </SiteShell>
-  );
+        )
+      }
+    />
+  </SiteShell>
+);
 }

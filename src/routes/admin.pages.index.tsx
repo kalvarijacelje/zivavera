@@ -41,9 +41,56 @@ export const Route = createFileRoute("/admin/pages/")({
 });
 
 // Built-in pages have dedicated public routes (about.tsx, visit.tsx,
-// hospitality.tsx). They cannot be deleted, but their content is still
+// hospitality.tsx, prayer.tsx, events.tsx). They cannot be deleted, but their content is still
 // editable through the section editor like any other page.
-const BUILT_IN_KEYS = new Set(["about", "visit", "hospitality", "prayer"]);
+const BUILT_IN_KEYS = new Set(["about", "visit", "hospitality", "prayer", "events"]);
+
+const BUILT_IN_PAGE_DEFAULTS: Record<
+  string,
+  {
+    internal_label: string;
+    title_en: string;
+    title_sl: string;
+    show_in_navigation: boolean;
+    nav_order: number;
+  }
+> = {
+  about: {
+    internal_label: "About Us",
+    title_sl: "Spoznajte nas",
+    title_en: "Get to know us",
+    show_in_navigation: true,
+    nav_order: 10,
+  },
+  visit: {
+    internal_label: "Visit Us",
+    title_sl: "Obiščite nas",
+    title_en: "Visit us",
+    show_in_navigation: true,
+    nav_order: 20,
+  },
+  hospitality: {
+    internal_label: "Hospitality",
+    title_sl: "Naše gostoljubje",
+    title_en: "Our Hospitality",
+    show_in_navigation: true,
+    nav_order: 30,
+  },
+  prayer: {
+    internal_label: "Prayer Requests",
+    title_sl: "Molitev",
+    title_en: "Prayer",
+    show_in_navigation: true,
+    nav_order: 40,
+  },
+  events: {
+    internal_label: "Events",
+    title_sl: "Dogodki",
+    title_en: "Events",
+    show_in_navigation: false,
+    nav_order: 15,
+  },
+};
 
 // Reserved keys cannot be used for new pages because they collide with
 // existing top-level routes or admin paths. The dynamic public renderer
@@ -53,10 +100,10 @@ const RESERVED_KEYS = new Set([
   "visit",
   "hospitality",
   "prayer",
+  "events",
   "admin",
   "login",
   "menu",
-  "events",
   "index",
   "home",
   "sitemap.xml",
@@ -84,7 +131,47 @@ function PagesAdmin() {
       .order("internal_label")
       .limit(50);
     if (error) toast.error(error.message);
-    else setRows((data as unknown as StaticPage[]) ?? []);
+
+    const rawData = (data as unknown as StaticPage[]) ?? [];
+    const existingKeys = new Set(rawData.map((p) => p.page_key));
+    const missing = Object.entries(BUILT_IN_PAGE_DEFAULTS).filter(
+      ([key]) => !existingKeys.has(key),
+    );
+
+    if (missing.length > 0) {
+      await Promise.all(
+        missing.map(([key, def]) =>
+          supabase.from("static_pages").upsert(
+            {
+              page_key: key,
+              internal_label: def.internal_label,
+              title_en: def.title_en,
+              title_sl: def.title_sl,
+              published: true,
+              show_in_navigation: def.show_in_navigation ?? false,
+              nav_order: def.nav_order ?? 50,
+            },
+            { onConflict: "page_key" }
+          )
+        )
+      );
+
+      const refetched = await supabase
+        .from("static_pages")
+        .select("id, page_key, internal_label, title_en, title_sl, published, show_in_navigation, nav_order")
+        .order("show_in_navigation", { ascending: false })
+        .order("nav_order")
+        .order("internal_label")
+        .limit(50);
+
+      if (!refetched.error && refetched.data) {
+        setRows((refetched.data as unknown as StaticPage[]) ?? []);
+        setLoading(false);
+        return;
+      }
+    }
+
+    setRows(rawData);
     setLoading(false);
   };
 
