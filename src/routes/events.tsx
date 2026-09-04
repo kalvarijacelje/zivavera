@@ -7,6 +7,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { getEffectiveEventDate, formatRecurrenceLabel, type RecurrenceInterval } from "@/lib/events";
+import { FormattedEventDescription } from "@/components/FormattedEventDescription";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -289,7 +290,7 @@ function EventsPage() {
                                 )}
                               </div>
                               {desc && (
-                                <p className="mt-4 leading-relaxed text-foreground/80">{desc}</p>
+                                <FormattedEventDescription text={desc} />
                               )}
                             </div>
                           </div>

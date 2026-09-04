@@ -470,17 +470,27 @@ function EventDialog({
               <Input value={v.title_sl} onChange={(e) => setV({ ...v, title_sl: e.target.value })} required />
             </div>
             <div className="space-y-1.5">
-              <Label>Description (EN)</Label>
+              <div className="flex items-center justify-between">
+                <Label>Description (EN)</Label>
+                <span className="text-[11px] text-muted-foreground">Enter = new line · &lt;br&gt;</span>
+              </div>
               <Textarea
-                rows={3}
+                rows={5}
+                className="font-sans leading-relaxed"
+                placeholder="Event description...&#10;&#10;• Bullet points&#10;• Highlights&#10;&#10;Details..."
                 value={v.description_en ?? ""}
                 onChange={(e) => setV({ ...v, description_en: e.target.value })}
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Description (SL)</Label>
+              <div className="flex items-center justify-between">
+                <Label>Description (SL)</Label>
+                <span className="text-[11px] text-muted-foreground">Enter = nova vrstica · &lt;br&gt;</span>
+              </div>
               <Textarea
-                rows={3}
+                rows={5}
+                className="font-sans leading-relaxed"
+                placeholder="Opis dogodka...&#10;&#10;• Točke programa&#10;• Poudarki&#10;&#10;Podrobnosti..."
                 value={v.description_sl ?? ""}
                 onChange={(e) => setV({ ...v, description_sl: e.target.value })}
               />
