@@ -30,11 +30,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
+import { Pencil, Trash2, Plus, ArrowUp, ArrowDown, Repeat, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { ImageField } from "@/components/admin/ImageField";
 import { SignedImage } from "@/components/admin/SignedImage";
 import { deleteMedia } from "@/lib/admin/storage";
+import { getEffectiveEventDate, formatRecurrenceLabel, parseDateYMD, type RecurrenceInterval } from "@/lib/events";
 
 export const Route = createFileRoute("/admin/events")({
   component: EventsPage,
@@ -57,6 +58,8 @@ type Ev = {
   featured: boolean;
   sort_order: number;
   published: boolean;
+  is_recurring: boolean;
+  recurrence_interval: RecurrenceInterval;
 };
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -75,6 +78,8 @@ const empty: Omit<Ev, "id"> = {
   featured: false,
   sort_order: 0,
   published: true,
+  is_recurring: false,
+  recurrence_interval: "weekly",
 };
 
 function EventsPage() {
@@ -92,7 +97,7 @@ function EventsPage() {
       supabase.from("event_categories").select("id, name_en").order("sort_order").limit(100),
       supabase
         .from("events")
-        .select("id, category_id, title_en, title_sl, description_en, description_sl, event_date, event_time, location_or_note_en, location_or_note_sl, image_path, image_alignment, featured, sort_order, published")
+        .select("*")
         .order("sort_order")
         .order("event_date")
         .limit(150),
@@ -100,7 +105,54 @@ function EventsPage() {
     if (cRes.error) toast.error(cRes.error.message);
     if (eRes.error) toast.error(eRes.error.message);
     setCats((cRes.data as Cat[]) ?? []);
-    setRows((eRes.data as Ev[]) ?? []);
+
+    const rawRows = (eRes.data as any[]) ?? [];
+    const normalized: Ev[] = rawRows.map((r) => {
+      // Default to recurring if explicitly marked or if youth gathering
+      const isYouth =
+        r.title_en?.toLowerCase().includes("youth") ||
+        r.title_sl?.toLowerCase().includes("mlade");
+      const isRec =
+        r.is_recurring !== undefined && r.is_recurring !== null
+          ? Boolean(r.is_recurring)
+          : isYouth;
+
+      return {
+        ...r,
+        is_recurring: isRec,
+        recurrence_interval: (r.recurrence_interval as RecurrenceInterval) || "weekly",
+      };
+    });
+
+    // Auto-advance any recurring events whose stored date expired
+    const expiredRecurring = normalized.filter((ev) => {
+      if (!ev.is_recurring) return false;
+      const eff = getEffectiveEventDate(ev);
+      return eff.effectiveDate !== ev.event_date;
+    });
+
+    if (expiredRecurring.length > 0) {
+      Promise.all(
+        expiredRecurring.map(async (ev) => {
+          const eff = getEffectiveEventDate(ev);
+          try {
+            await supabase
+              .from("events")
+              .update({
+                event_date: eff.effectiveDate,
+                published: true,
+                is_recurring: true,
+                recurrence_interval: ev.recurrence_interval || "weekly",
+              })
+              .eq("id", ev.id);
+          } catch {
+            // ignore if columns not in DB yet
+          }
+        })
+      ).catch(() => {});
+    }
+
+    setRows(normalized);
     setLoading(false);
   }, []);
 
@@ -205,6 +257,7 @@ function EventsPage() {
             )}
             {filtered.map((row, i) => {
               const cat = cats.find((c) => c.id === row.category_id);
+              const effective = getEffectiveEventDate(row);
               return (
                 <tr key={row.id}>
                   <td className="px-3 py-2">
@@ -230,9 +283,19 @@ function EventsPage() {
                     <div className="font-medium">{row.title_en}</div>
                     <div className="text-xs text-muted-foreground">{row.title_sl}</div>
                   </td>
-                  <td className="px-3 py-2 text-muted-foreground">
-                    {row.event_date}
-                    {row.event_time ? ` · ${row.event_time.slice(0, 5)}` : ""}
+                  <td className="px-3 py-2">
+                    <div className="font-medium text-foreground">
+                      {effective.effectiveDate}
+                      {row.event_time ? ` · ${row.event_time.slice(0, 5)}` : ""}
+                    </div>
+                    {effective.isRecurring ? (
+                      <div className="flex items-center gap-1 text-[11px] text-primary mt-0.5">
+                        <Repeat className="size-3 shrink-0" />
+                        <span>{formatRecurrenceLabel(row.recurrence_interval, effective.dayOfWeek, "en", row.event_time)}</span>
+                      </div>
+                    ) : (
+                      effective.isPast && <span className="text-[11px] text-muted-foreground italic">(past)</span>
+                    )}
                   </td>
                   <td className="px-3 py-2 text-muted-foreground">{cat?.name_en ?? "—"}</td>
                   <td className="px-3 py-2">
@@ -245,6 +308,11 @@ function EventsPage() {
                           {row.featured ? "★ Featured" : "Feature"}
                         </Badge>
                       </button>
+                      {effective.isRecurring && (
+                        <Badge variant="outline" className="border-primary/40 text-primary">
+                          🔄 Weekly
+                        </Badge>
+                      )}
                       <Badge variant="outline">img: {row.image_alignment}</Badge>
                     </div>
                   </td>
@@ -310,7 +378,12 @@ function EventDialog({
 }) {
   const [v, setV] = useState<Omit<Ev, "id">>(
     initial
-      ? { ...initial, event_time: initial.event_time ? initial.event_time.slice(0, 5) : null }
+      ? {
+          ...initial,
+          event_time: initial.event_time ? initial.event_time.slice(0, 5) : null,
+          is_recurring: Boolean(initial.is_recurring),
+          recurrence_interval: initial.recurrence_interval || "weekly",
+        }
       : empty,
   );
   const [busy, setBusy] = useState(false);
@@ -332,10 +405,25 @@ function EventDialog({
       location_or_note_sl: v.location_or_note_sl?.trim() || null,
       event_time: v.event_time ? v.event_time : null,
       sort_order: Number(v.sort_order) || 0,
+      is_recurring: Boolean(v.is_recurring),
+      recurrence_interval: v.recurrence_interval || "weekly",
     };
-    const res = initial
+
+    let res = initial
       ? await supabase.from("events").update(payload).eq("id", initial.id)
       : await supabase.from("events").insert(payload);
+
+    // Fallback if DB columns have not yet been migrated in Supabase
+    if (res.error && res.error.message.includes("is_recurring")) {
+      const { is_recurring, recurrence_interval, ...fallbackPayload } = payload;
+      res = initial
+        ? await supabase.from("events").update(fallbackPayload).eq("id", initial.id)
+        : await supabase.from("events").insert(fallbackPayload);
+      if (!res.error) {
+        toast.info("Saved! Remember to execute the SQL migration in Supabase SQL editor to enable the database columns.");
+      }
+    }
+
     setBusy(false);
     if (res.error) {
       toast.error(res.error.message);
@@ -429,6 +517,63 @@ function EventDialog({
               />
             </div>
           </div>
+
+          {/* Recurrence Settings */}
+          <div className="rounded-xl border border-border bg-muted/40 p-3.5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-sm font-medium flex items-center gap-1.5">
+                  <Repeat className="size-4 text-primary" />
+                  <span>Recurring event</span>
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Automatically repeats each week, stays published, and advances date when expired.
+                </p>
+              </div>
+              <Switch
+                checked={v.is_recurring}
+                onCheckedChange={(c) => setV({ ...v, is_recurring: c })}
+              />
+            </div>
+
+            {v.is_recurring && (
+              <div className="grid gap-3 pt-2 sm:grid-cols-2 border-t border-border/60">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Repeat frequency</Label>
+                  <Select
+                    value={v.recurrence_interval}
+                    onValueChange={(val) =>
+                      setV({ ...v, recurrence_interval: val as RecurrenceInterval })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="weekly">Weekly (every week)</SelectItem>
+                      <SelectItem value="biweekly">Bi-weekly (every 2 weeks)</SelectItem>
+                      <SelectItem value="monthly">Monthly (every month)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Schedule preview</Label>
+                  <div className="rounded-md bg-background px-3 py-2 text-xs text-foreground border border-input flex items-center gap-1.5">
+                    <Sparkles className="size-3.5 text-primary shrink-0" />
+                    <span className="font-medium">
+                      {formatRecurrenceLabel(
+                        v.recurrence_interval,
+                        parseDateYMD(v.event_date || today()).getDay(),
+                        "en",
+                        v.event_time
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="space-y-1.5">
             <Label>Image</Label>
             <ImageField value={v.image_path} onChange={(p) => setV({ ...v, image_path: p })} folder="events" />

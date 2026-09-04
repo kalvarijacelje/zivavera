@@ -97,7 +97,6 @@ export async function directUploadToR2(file: File | Blob, r2Path: string, conten
       method: "PUT",
       headers: {
         "Content-Type": mime,
-        "Host": host,
         "x-amz-content-sha256": payloadHash,
         "x-amz-date": amzDate,
         "Authorization": authorizationHeader,

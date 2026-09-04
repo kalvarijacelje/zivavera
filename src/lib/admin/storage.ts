@@ -7,9 +7,14 @@ const BUCKET = "media";
 
 export type MediaFolder = "menu" | "events" | "homepage" | "pages";
 
-export async function uploadMedia(file: File, folder: MediaFolder): Promise<string> {
+export async function uploadMedia(
+  file: File,
+  folder: MediaFolder,
+  onProgress?: (status: string) => void
+): Promise<string> {
   let fileToUpload = file;
   
+  onProgress?.("Shrinking and optimizing...");
   // Automatically optimize images client-side before upload (<400KB, max 1920px, WebP)
   if (file.type.startsWith("image/") && !file.type.includes("svg") && !file.type.includes("gif")) {
     try {
@@ -27,14 +32,18 @@ export async function uploadMedia(file: File, folder: MediaFolder): Promise<stri
   const ext = fileToUpload.name.split(".").pop()?.toLowerCase() || "bin";
   const path = `${folder}/${crypto.randomUUID()}.${ext}`;
 
+  onProgress?.("Uploading to Cloudflare R2...");
   // 1. Upload to Cloudflare R2 bucket (kck-media)
   try {
-    await directUploadToR2(fileToUpload, path, fileToUpload.type);
-    await directUploadToR2(fileToUpload, `media/${path}`, fileToUpload.type);
+    const r2Ok = await directUploadToR2(fileToUpload, path, fileToUpload.type);
+    if (r2Ok) {
+      await directUploadToR2(fileToUpload, `media/${path}`, fileToUpload.type);
+    }
   } catch (r2Err) {
     console.warn("Direct R2 upload background warning:", r2Err);
   }
 
+  onProgress?.("Saving backup...");
   // 2. Upload to Supabase Storage (maintains 100% full compatibility)
   const { error } = await supabase.storage.from(BUCKET).upload(path, fileToUpload, {
     cacheControl: "3600",

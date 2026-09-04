@@ -7,6 +7,8 @@ export interface CafeEvent {
   startsAt: string; // ISO
   location: Record<Locale, string>;
   published: boolean;
+  is_recurring?: boolean;
+  recurrence_interval?: string;
 }
 
 const inDays = (n: number, hours = 18) => {

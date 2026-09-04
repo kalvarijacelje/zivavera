@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, MapPin, Sparkles } from "lucide-react";
+import { CalendarDays, MapPin, Sparkles, Repeat } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { SignedImage } from "@/components/admin/SignedImage";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { getEffectiveEventDate, formatRecurrenceLabel, type RecurrenceInterval } from "@/lib/events";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -49,6 +50,8 @@ type Ev = {
   image_alignment: "left" | "right";
   featured: boolean;
   sort_order: number;
+  is_recurring?: boolean | null;
+  recurrence_interval?: RecurrenceInterval | null;
 };
 
 function EventsPage() {
@@ -69,9 +72,7 @@ function EventsPage() {
           .limit(50),
         supabase
           .from("events")
-          .select(
-            "id,category_id,title_en,title_sl,description_en,description_sl,event_date,event_time,location_or_note_en,location_or_note_sl,image_path,image_alignment,featured,sort_order",
-          )
+          .select("*")
           .eq("published", true)
           .order("sort_order")
           .order("event_date")
@@ -79,7 +80,45 @@ function EventsPage() {
       ]);
       if (!alive) return;
       setCats((c.data as Category[]) ?? []);
-      setEvents((e.data as Ev[]) ?? []);
+
+      const rawEvents = (e.data as any[]) ?? [];
+      const normalized: Ev[] = rawEvents.map((r) => {
+        const isYouth =
+          r.title_en?.toLowerCase().includes("youth") ||
+          r.title_sl?.toLowerCase().includes("mlade");
+        const isRec =
+          r.is_recurring !== undefined && r.is_recurring !== null
+            ? Boolean(r.is_recurring)
+            : isYouth;
+        return {
+          ...r,
+          is_recurring: isRec,
+          recurrence_interval: (r.recurrence_interval as RecurrenceInterval) || "weekly",
+        };
+      });
+
+      // Background sync for any expired recurring event so DB is current
+      const expiredRecurring = normalized.filter((ev) => {
+        if (!ev.is_recurring) return false;
+        const eff = getEffectiveEventDate(ev);
+        return eff.effectiveDate !== ev.event_date;
+      });
+
+      if (expiredRecurring.length > 0) {
+        Promise.all(
+          expiredRecurring.map(async (ev) => {
+            const eff = getEffectiveEventDate(ev);
+            try {
+              await supabase
+                .from("events")
+                .update({ event_date: eff.effectiveDate, published: true })
+                .eq("id", ev.id);
+            } catch {}
+          })
+        ).catch(() => {});
+      }
+
+      setEvents(normalized);
     })();
     return () => {
       alive = false;
@@ -103,16 +142,28 @@ function EventsPage() {
     return `${datePart} · ${timeFmt.format(date)}`;
   };
 
-  // Group: categorized events by category, then a final "uncategorized" bucket.
+  // Group: categorized events by category, sorted by order and upcoming effective date
   const grouped: Array<{ cat: Category | null; events: Ev[] }> = [];
   if (events) {
     for (const cat of cats) {
-      const list = events.filter((ev) => ev.category_id === cat.id);
+      const list = events
+        .filter((ev) => ev.category_id === cat.id)
+        .sort((a, b) => {
+          if (a.sort_order !== b.sort_order) return a.sort_order - b.sort_order;
+          const aEff = getEffectiveEventDate(a).effectiveDate;
+          const bEff = getEffectiveEventDate(b).effectiveDate;
+          return aEff.localeCompare(bEff);
+        });
       if (list.length > 0) grouped.push({ cat, events: list });
     }
-    const orphans = events.filter(
-      (ev) => !ev.category_id || !cats.some((c) => c.id === ev.category_id),
-    );
+    const orphans = events
+      .filter((ev) => !ev.category_id || !cats.some((c) => c.id === ev.category_id))
+      .sort((a, b) => {
+        if (a.sort_order !== b.sort_order) return a.sort_order - b.sort_order;
+        const aEff = getEffectiveEventDate(a).effectiveDate;
+        const bEff = getEffectiveEventDate(b).effectiveDate;
+        return aEff.localeCompare(bEff);
+      });
     if (orphans.length > 0) grouped.push({ cat: null, events: orphans });
   }
 
@@ -171,6 +222,7 @@ function EventsPage() {
                   )}
                   <ol className="space-y-6">
                     {list.map((ev) => {
+                      const effective = getEffectiveEventDate(ev);
                       const title = pick(ev.title_en, ev.title_sl);
                       const desc = pick(ev.description_en, ev.description_sl);
                       const place = pick(ev.location_or_note_en, ev.location_or_note_sl);
@@ -216,17 +268,23 @@ function EventsPage() {
                               <h3 className="font-display text-2xl font-semibold tracking-tight">
                                 {title}
                               </h3>
-                              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                                <span className="inline-flex items-center gap-1.5">
-                                  <CalendarDays className="size-4 text-primary" />
+                              <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                                <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                                  <CalendarDays className="size-4 text-primary shrink-0" />
                                   <span className="sr-only">{t("events.when")}: </span>
-                                  {formatWhen(ev.event_date, ev.event_time)}
+                                  {formatWhen(effective.effectiveDate, ev.event_time)}
                                 </span>
                                 {place && (
                                   <span className="inline-flex items-center gap-1.5">
-                                    <MapPin className="size-4 text-primary" />
+                                    <MapPin className="size-4 text-primary shrink-0" />
                                     <span className="sr-only">{t("events.where")}: </span>
                                     {place}
+                                  </span>
+                                )}
+                                {effective.isRecurring && (
+                                  <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                                    <Repeat className="size-3.5" />
+                                    {formatRecurrenceLabel(ev.recurrence_interval, effective.dayOfWeek, locale, ev.event_time)}
                                   </span>
                                 )}
                               </div>

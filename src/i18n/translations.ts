@@ -81,6 +81,8 @@ const en: TranslationDict = {
   "events.empty": "No upcoming events right now. Check back soon.",
   "events.when": "When",
   "events.where": "Where",
+  "events.recurring": "Recurring",
+  "events.repeatsWeekly": "Repeats weekly",
 
   "about.title": "A unique café that runs on faith",
   "about.s1.title": "Welcome to ŽIVA VERA",
@@ -128,6 +130,12 @@ const en: TranslationDict = {
   "admin.status.published": "Published",
   "admin.status.draft": "Draft",
   "admin.featured": "Featured",
+  "admin.events.recurring": "Recurring event",
+  "admin.events.recurrence": "Frequency",
+  "admin.events.weekly": "Weekly",
+  "admin.events.biweekly": "Every 2 weeks",
+  "admin.events.monthly": "Monthly",
+  "admin.events.recurringDesc": "Automatically published for the current week and advances to next week when expired.",
 
   // Admin Navigation
   "admin.nav.dashboard": "Dashboard",
@@ -338,6 +346,8 @@ const sl: TranslationDict = {
   "events.empty": "Trenutno ni napovedanih dogodkov. Vrnite se kmalu.",
   "events.when": "Kdaj",
   "events.where": "Kje",
+  "events.recurring": "Ponavljajoče",
+  "events.repeatsWeekly": "Ponavlja se tedensko",
 
   "about.title": "Unikatna kavarna, ki deluje po veri",
   "about.s1.title": "Dobrodošli v Živi veri",
@@ -385,6 +395,12 @@ const sl: TranslationDict = {
   "admin.status.published": "Objavljeno",
   "admin.status.draft": "Osnutek",
   "admin.featured": "Priporočeno",
+  "admin.events.recurring": "Ponavljajoč se dogodek",
+  "admin.events.recurrence": "Pogostost ponavljanja",
+  "admin.events.weekly": "Tedensko",
+  "admin.events.biweekly": "Vsaka 2 tedna",
+  "admin.events.monthly": "Mesečno",
+  "admin.events.recurringDesc": "Samodejno objavljeno za tekoči teden; ko datum poteče, se samodejno premakne na naslednji teden.",
 
   // Admin Navigation
   "admin.nav.dashboard": "Nadzorna plošča",

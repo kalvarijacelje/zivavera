@@ -152,8 +152,9 @@ export function MediaPickerDialog({
             grouped.map(([folder, list]) => (
               <section key={folder} className="mb-5">
                 <div className="mb-2 flex items-center gap-2">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    media / {folder}
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <span className="text-[10px] bg-amber-50 text-amber-900 border border-amber-200 px-1.5 py-0.5 rounded font-mono">R2</span>
+                    <span>{folder}</span>
                   </h3>
                   <Badge variant="outline">{list.length}</Badge>
                 </div>
@@ -185,11 +186,11 @@ export function MediaPickerDialog({
                           </span>
                         )}
                         <div className="space-y-0.5 p-2">
-                          <p className="truncate text-xs font-medium" title={it.name}>
+                          <p className="truncate text-xs font-medium font-mono" title={it.name}>
                             {it.name}
                           </p>
                           <p className="truncate text-[10px] text-muted-foreground">
-                            media/{it.folder}
+                            {it.folder}
                           </p>
                           {isCurrent && (
                             <Badge variant="secondary" className="mt-1 text-[10px]">

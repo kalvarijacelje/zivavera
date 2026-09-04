@@ -69,10 +69,15 @@ export function SiteHeader() {
       }
       setDeferredPrompt(null);
     } else {
+      const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || 'ontouchstart' in window);
       alert(
-        locale === 'sl'
-          ? 'Za namestitev aplikacije Živa Vera na začetni zaslon izberite »Dodaj na začetni zaslon« v meniju brskalnika.'
-          : 'To install the Živa Vera app on your home screen, tap "Add to Home Screen" in your browser menu.'
+        isMobile
+          ? (locale === 'sl'
+              ? 'Za namestitev aplikacije Živa Vera na začetni zaslon izberite »Dodaj na začetni zaslon« v meniju brskalnika.'
+              : 'To install the Živa Vera app on your home screen, tap "Add to Home Screen" in your browser menu.')
+          : (locale === 'sl'
+              ? 'Za namestitev na računalnik kliknite na ikono za namestitev v naslovni vrstici brskalnika (zgoraj desno).'
+              : 'To install on your computer, click the install icon in your browser address bar (top right).')
       );
     }
   };
@@ -195,10 +200,10 @@ export function SiteHeader() {
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-stone-950/95 backdrop-blur-md text-white text-[11px] font-semibold rounded-xl shadow-2xl border border-white/20 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 transform translate-y-1 group-hover:translate-y-0">
                 <div className="flex items-center gap-1.5">
                   <Smartphone className="size-3.5 text-amber-400" />
-                  <span>{locale === 'sl' ? 'Namesti ŽIVA VERA na telefon / PC' : 'Install ŽIVA VERA to Home Screen'}</span>
+                  <span>{locale === 'sl' ? 'Namesti aplikacijo ŽIVA VERA' : 'Install ŽIVA VERA App'}</span>
                 </div>
                 <div className="text-[9px] text-amber-200 font-normal text-center mt-0.5">
-                  {locale === 'sl' ? 'Hitrejši 1-klik dostop brez brskalnika' : 'Fast 1-click home screen access'}
+                  {locale === 'sl' ? 'Hitrejši 1-klik dostop brez brskalnika' : 'Fast 1-click standalone access'}
                 </div>
               </div>
             </div>
